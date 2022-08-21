@@ -6,11 +6,10 @@ Backend repository for Startup Campus
 
 Follow these instruction to start using this repository:
 
-- [ ] Create your own private repository by [forking this repository](###fork-repository)
-- [ ] [Clone from your new repository](###clone-repository)
-- [ ] [Install Python 3.9](###python-installation)
-- [ ] Create [virtual environment](###virtual-environment)
-
+- [ ] Create your own private repository by [forking this repository](https://gitlab.com/startupcampus.be/startup-campus-backend#fork-repository)
+- [ ] [Clone from your new repository](https://gitlab.com/startupcampus.be/startup-campus-backend#clone-repository)
+- [ ] [Install Python 3.9](https://gitlab.com/startupcampus.be/startup-campus-backend#python-installation)
+- [ ] Setup a new [virtual environment](https://gitlab.com/startupcampus.be/startup-campus-backend#python-installation)
 ***
 
 ## Assignments
@@ -29,13 +28,30 @@ All assignments will be pushed into the **Projects** folder, each with its own s
 
 ## Fork repository
 
-TODO: image how to fork
+Go to https://gitlab.com/startupcampus.be/startup-campus-backend and on the right hand side, click `Fork` button.
 
-Don't forget to set the visibility to public so mentors can access your repo for grading purposes!
+![](/images/fork-button.png)
+
+In the next page, 
+- set your `project URL` by selecting your username in the namespace box
+- set `Visibility level` to **Private**
+- click `Fork Project` button
+
+![](/images/fork-project-creation.png)
+
+Wait a bit, and you will be redirected into your new private repository. Check that the browser URL should now be `https://gitlab.com/<your_gitlab_username>/startup-campus-backend` and you can see **Forked from Startup Campus BE / Startup Campus - Backend** on the new page.
+
+![](/images/fork-project-done.png)
+
+Finally, invite your mentor as a member of this repository by:
+- Go to `https://gitlab.com/<your_gitlab_username>/startup-campus-backend/-/project_members` or from your repository homepage, check the left side panel and go to `Project Information > Members`
+- Click `Invite members` button on the top right
+- Enter the Gitlab username/email address of your mentor and select `Maintainer` role
+- Finalize by clicking `Invite` button
 
 ## Clone repository
 
-In your local machine, run the following
+After finish setting up your private repository, run the following in your local machine
 ```
 cd <base_folder_path>
 git clone https://gitlab.com/<your_gitlab_username>/startup-campus-backend.git
@@ -115,6 +131,6 @@ Make sure that you are using this environment when you are working on your assig
 
 To stop using virtual environment, just run
 ```
-deactvate
+deactivate
 ```
 and check that the prefix `[environment_name]` is now gone as well.

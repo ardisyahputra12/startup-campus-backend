@@ -1,1 +1,3 @@
 startup-campus-backend/
+*.pyc
+__pycache__/

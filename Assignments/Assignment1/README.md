@@ -42,7 +42,25 @@ def function_to_implement(...)
 
 If you encounter any issues understanding the problem statement, feel free to ask and reach out to your mentors!
 
+## Grading
+
+Your grade will be mainly deducd by the amount of test cases you manage to pass across the whole problem sets. See Testing on how to check your live grades.
+
+Mentors will also check your codes (in the Merge Request) to ensure no cheating attempts is performed.
+
 ## Testing
+
+To test locally, go to the relative path for assignment 1
+```
+cd
+cd startup-campus-backend/Assigments/Assignment1
+```
+
+then run
+```
+python3.9 -m grader
+```
+you will be able to see details regarding the performance of your code and overall grade for this assignment.
 
 ## Submission
 

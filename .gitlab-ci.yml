@@ -1,0 +1,20 @@
+image: python:3.9-slim
+
+variables:
+  ENVIRONMENT_NAME: startup-campus-backend
+
+stages:
+  - grade
+
+before_script:
+  - python --version # For debugging
+  - python3.9 -m pip install virtualenv
+  - python3.9 -m venv $ENVIRONMENT_NAME
+  - source $ENVIRONMENT_NAME/bin/activate
+
+grade-assignment1:
+  stage: grade
+  script:
+    - pwd && ls # for debugging
+    - cd Assignments/Assignment1
+    - python3.9 -m grader

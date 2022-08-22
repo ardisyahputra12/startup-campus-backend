@@ -1,5 +1,5 @@
 """
-Even sum.
+Even sum. [WEIGHT = 1]
 
 Given a list of integers, return the sum of the even numbers within a list. 
 If the list doesn't contain any even numbers, return 0. The list will contain
@@ -11,7 +11,7 @@ Input: [0, 2, 3, 4]
 Output: 6
 Explanation: All numbers are even except 3, so the total is 0+2+4 = 6
 ------------------------------------
-Input: [-11, 3, 7 ]
+Input: [-11, 3, 7]
 Output: 0
 Explanation: All numbers are odd, so return 0
 ------------------------------------

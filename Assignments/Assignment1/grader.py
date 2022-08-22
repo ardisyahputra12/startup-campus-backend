@@ -1,4 +1,7 @@
+from functools import wraps
 from json import dumps
+from random import choices, randint
+from string import ascii_lowercase
 from typing import List
 
 FAILED_CASE = None
@@ -24,8 +27,9 @@ def score_case(f: callable, input_d: dict) -> bool:
 
 def grade(title: str, weight: str):
     def dec(f: callable):
+        @wraps(f)
         def dec2(*args, **kwargs):
-            print(f"Grading {title} (weight=1)... ")
+            print(f"Grading {title} (weight={weight})... ")
             user_score, full_score = f(*args, **kwargs)
 
             print(f"    You solved {user_score} out of {full_score} cases", end=" ")
@@ -39,7 +43,10 @@ def grade(title: str, weight: str):
 
 
 def stringify(v):
-    return dumps(v)
+    try:
+        return dumps(v)
+    except TypeError:
+        return str(v)
 
 
 def process_case(f: callable, cases: List[dict]):
@@ -106,6 +113,7 @@ def test_p2():
             "args": {"Spaces in the mid     dle are fine but this is not    "},
             "result": "Spaces in the mid     dle are fine but this is not",
         },
+        {"args": {"???Vini\nVidi\nVici!\n"}, "result": "Vini Vidi Vici"},
     ]
 
     return process_case(clean_sentence, cases)
@@ -130,8 +138,327 @@ def test_p3():
     return process_case(even_sum, cases)
 
 
+@grade("Problem 4", weight=1)
+def test_p4():
+    from p4 import arithmetic_generator
+
+    cases = [
+        {"args": (3, 5, 4), "result": [3, 7, 11, 15, 19]},
+        {"args": (6, 4, -2), "result": [6, 4, 2, 0]},
+        {"args": (9, 10, 12), "result": [9, 21, 33, 45, 57, 69, 81, 93, 105, 117]},
+        {
+            "args": (1, 20, 0),
+            "result": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        },
+        {
+            "args": (0, 10, -13),
+            "result": [0, -13, -26, -39, -52, -65, -78, -91, -104, -117],
+        },
+        {"args": (123456789, 1, 1000), "result": [123456789]},
+    ]
+    return process_case(arithmetic_generator, cases)
+
+
+@grade("Problem 5", weight=1)
+def test_p5():
+    from p5 import find_by_label
+
+    cases = [
+        {
+            "args": (
+                ["club_name", "score", "captain"],
+                ["manchester united", "4-0", "maguire"],
+                "score",
+            ),
+            "result": "4-0",
+        },
+        {
+            "args": (
+                ["name", "age", "birthday"],
+                ["jhony", 21, "August 14, 1995"],
+                "score",
+            ),
+            "result": "Information not available",
+        },
+        {
+            "args": (
+                ["name", "age", "birthday"],
+                ["jhony", 21, "August 14, 1995"],
+                "name",
+            ),
+            "result": "jhony",
+        },
+        {
+            "args": (["index", "title", "extra"], [0, "Mr.", ["a", "b"]], "extra"),
+            "result": ["a", "b"],
+        },
+        {
+            "args": (["index", "title", "extra"], [0, "Mr.", None], "Index"),
+            "result": "Information not available",
+        },
+    ]
+    return process_case(find_by_label, cases)
+
+
+@grade("Problem 6", weight=1)
+def test_p6():
+    from p6 import factorial
+
+    cases = [
+        {"args": (5,), "result": 120},
+        {"args": (10,), "result": 3628800},
+        {"args": (7,), "result": 5040},
+        {"args": (20,), "result": 2432902008176640000},
+        {"args": (-7,), "result": -1},
+        {"args": (0,), "result": 1},
+        {"args": (1,), "result": 1},
+    ]
+    return process_case(factorial, cases)
+
+
+@grade("Problem 7", weight=2)
+def test_p7():
+    from p7 import smartest_students
+
+    all_except_A = [chr(ord("Z") - i) for i in range(25)]
+    cases = [
+        {"args": ({"Alan": 80, "Bishop": 90, "Claire": 80},), "result": "Bishop"},
+        {
+            "args": ({"Dwight": 80, "Bishop": 70, "Claire": 80},),
+            "result": ["Claire", "Dwight"],
+        },
+        {
+            "args": ({"Alan": 85, "Bishop": 85},),
+            "result": "All are winners",
+        },
+        {
+            "args": (
+                {
+                    **{
+                        "".join(choices(ascii_lowercase, k=5)).capitalize(): randint(
+                            1, 99
+                        )
+                        for _ in range(98)
+                    },
+                    "Aa": 100,
+                    "A": 100,
+                },
+            ),
+            "result": ["A", "Aa"],
+        },
+        {
+            "args": ({"A": 99, **{c: 100 for c in all_except_A}},),
+            "result": sorted(all_except_A),
+        },
+        {
+            "args": ({"Alan J": 75, "Alan X": 70, "Alan B": 75},),
+            "result": ["Alan B", "Alan J"],
+        },
+        {"args": ({"Alone": 93},), "result": "All are winners"},
+    ]
+
+    return process_case(smartest_students, cases)
+
+
+@grade("Problem 8", weight=2)
+def test_p8():
+    from p8 import calculate_through_commands
+
+    cases = [
+        {"args": (8, ["mul 2", "sub 4"]), "result": 12},
+        {"args": (2, ["add 3", "reset", "sub 2"]), "result": 0},
+        {"args": (-10, ["mul -3", "stop", "sub 2", "add -5"]), "result": 30},
+        {
+            "args": (
+                0,
+                ["reset", "sub 8", "sub -2", "stop", "sub 2", "mul -9", "sub -9"],
+            ),
+            "result": -6,
+        },
+        {
+            "args": (
+                1000,
+                [
+                    "reset",
+                    "reset",
+                    "reset",
+                    "add -4",
+                    "add 6",
+                    "reset",
+                    "add -6",
+                    "add -9",
+                    "sub 5",
+                    "add 7",
+                ],
+            ),
+            "result": 987,
+        },
+        {
+            "args": (
+                -1000,
+                [
+                    "sub -9",
+                    "sub -1",
+                    "add -7",
+                    "sub 7",
+                    "mul -5",
+                    "stop",
+                    "add 0",
+                    "mul -7",
+                    "add -8",
+                    "stop",
+                ],
+            ),
+            "result": 5020,
+        },
+        {"args": (123, []), "result": 123},
+    ]
+
+    return process_case(calculate_through_commands, cases)
+
+
+@grade("Problem 9", weight=2)
+def test_p9():
+    from p9 import kth_place
+
+    cases = [
+        {"args": ([3, 10, 12, 4, 5, 10], 3), "result": 5},
+        {"args": ([12, 50, 30], 4), "result": "There are less than 4 unique values"},
+        {"args": ([120, 100] + [randint(1, 99) for _ in range(98)], 2), "result": 100},
+        {
+            "args": ([-100 for _ in range(100)], 2),
+            "result": "There are less than 2 unique values",
+        },
+        {
+            "args": ([-100 for _ in range(100)], 1),
+            "result": -100,
+        },
+        {
+            "args": ([randint(1, 10) for _ in range(100)], 11),
+            "result": "There are less than 11 unique values",
+        },
+        {
+            "args": ([randint(-5, 5) for _ in range(100)], 4),
+            "result": 2,
+        },
+    ]
+
+    return process_case(kth_place, cases)
+
+
+@grade("Problem 10", weight=3)
+def test_p10():
+    from p10 import summarize_subject_scores
+
+    data1 = [
+        {"name": "Santi", "science": 60, "math": 90, "computer": 100},
+        {"name": "Joko", "science": 50, "math": 90, "computer": 30},
+        {"name": "Budi", "science": 80, "math": 30, "computer": 30},
+        {"name": "Beri", "science": 40, "math": 80, "computer": 60},
+    ]
+    data2 = [
+        {"name": "H", "science": 80, "math": 88, "computer": 62},
+        {"name": "E", "science": 89, "math": 77, "computer": 65},
+        {"name": "U", "science": 89, "math": 90, "computer": 81},
+        {"name": "S", "science": 82, "math": 80, "computer": 66},
+        {"name": "V", "science": 85, "math": 84, "computer": 94},
+        {"name": "N", "science": 81, "math": 76, "computer": 64},
+        {"name": "Q", "science": 88, "math": 89, "computer": 66},
+        {"name": "H", "science": 83, "math": 80, "computer": 82},
+        {"name": "G", "science": 87, "math": 82, "computer": 89},
+        {"name": "J", "science": 88, "math": 76, "computer": 96},
+        {"name": "H", "science": 80, "math": 75, "computer": 91},
+        {"name": "G", "science": 85, "math": 89, "computer": 77},
+        {"name": "R", "science": 82, "math": 84, "computer": 42},
+        {"name": "E", "science": 81, "math": 82, "computer": 51},
+        {"name": "F", "science": 84, "math": 82, "computer": 63},
+        {"name": "V", "science": 89, "math": 73, "computer": 96},
+        {"name": "M", "science": 89, "math": 74, "computer": 89},
+        {"name": "P", "science": 90, "math": 84, "computer": 39},
+        {"name": "O", "science": 85, "math": 85, "computer": 95},
+        {"name": "C", "science": 90, "math": 84, "computer": 79},
+        {"name": "M", "science": 87, "math": 75, "computer": 59},
+        {"name": "R", "science": 86, "math": 88, "computer": 87},
+        {"name": "B", "science": 88, "math": 90, "computer": 58},
+        {"name": "Y", "science": 80, "math": 76, "computer": 59},
+        {"name": "Y", "science": 81, "math": 73, "computer": 97},
+        {"name": "O", "science": 90, "math": 78, "computer": 71},
+    ]
+    cases = [
+        {
+            "args": (data1, "science"),
+            "result": {
+                "average": 58,
+                "highest": {"score": 80, "names": ["Budi"]},
+                "lowest": {"score": 40, "names": ["Beri"]},
+            },
+        },
+        {
+            "args": (data1, "math"),
+            "result": {
+                "average": 73,
+                "highest": {"score": 90, "names": ["Joko", "Santi"]},
+                "lowest": {"score": 30, "names": ["Budi"]},
+            },
+        },
+        {
+            "args": (data1, "computer"),
+            "result": {
+                "average": 55,
+                "highest": {"score": 100, "names": ["Santi"]},
+                "lowest": {"score": 30, "names": ["Budi", "Joko"]},
+            },
+        },
+        {
+            "args": (data2, "science"),
+            "result": {
+                "average": 86,
+                "highest": {"score": 90, "names": ["C", "O", "P"]},
+                "lowest": {"score": 80, "names": ["H"]},
+            },
+        },
+        {
+            "args": (data2, "math"),
+            "result": {
+                "average": 82,
+                "highest": {"score": 90, "names": ["B", "U"]},
+                "lowest": {"score": 73, "names": ["V", "Y"]},
+            },
+        },
+        {
+            "args": (data2, "computer"),
+            "result": {
+                "average": 73,
+                "highest": {"score": 97, "names": ["Y"]},
+                "lowest": {"score": 39, "names": ["P"]},
+            },
+        },
+        {
+            "args": ([], "math"),
+            "result": {
+                "average": 0,
+                "highest": {"score": 0, "names": []},
+                "lowest": {"score": 0, "names": []},
+            },
+        },
+    ]
+
+    return process_case(summarize_subject_scores, cases)
+
+
 if __name__ == "__main__":
-    tests = [test_p1, test_p2, test_p3]
+    tests = [
+        test_p1,
+        test_p2,
+        test_p3,
+        test_p4,
+        test_p5,
+        test_p6,
+        test_p7,
+        test_p8,
+        test_p9,
+        test_p10,
+    ]
 
     final_score = 0
     perfect_score = 0

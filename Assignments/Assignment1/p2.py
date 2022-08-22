@@ -1,5 +1,5 @@
 """
-Clean up sentences.
+Clean up sentences. [WEIGHT = 1]
 
 Given a string, you need to clean up and remove unnecessary characters.
 The only characters that are allowed are:
@@ -18,12 +18,12 @@ Input: "I am learning Python3???"
 Output: "I am learning Python3"
 Explanation: Remove the question marks at the end
 ------------------------------------
-Input: "Everything is good."
-Output: "Everything is good."
+Input: "Everything is good"
+Output: "Everything is good"
 Explanation: Nothing changes so return string as is
 ------------------------------------
 Input: "    Independence day: August 17th, 1945 "
-Output: "Independence day August 17th 1945."
+Output: "Independence day August 17th 1945"
 Explanation: Replace the : and , and then remove all trailing/leading spaces
 ------------------------------------
 """

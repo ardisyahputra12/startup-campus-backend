@@ -1,5 +1,5 @@
 """
-Divide it whole.
+Divide it whole. [WEIGHT = 1]
 
 Given two non-negative integers a and b, find the result of dividing a with b but with some notes:
 - If the result is not an integer, return the result rounded down to the nearest integer.

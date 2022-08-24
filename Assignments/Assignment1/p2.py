@@ -30,4 +30,13 @@ Explanation: Replace the : and , and then remove all trailing/leading spaces
 
 
 def clean_sentence(sentence: str) -> str:
-    pass
+    val = ""
+    for i in range(len(sentence)):
+        if sentence[i].isalnum(): val += sentence[i]
+        else: val += " "
+    return val.strip()
+
+
+# print(clean_sentence("I am learning Python3???"))
+# print(clean_sentence("Everything is good"))
+# print(clean_sentence("    Independence day: August 17th, 1945 "))

@@ -25,4 +25,13 @@ Explanation: Starts at 6, minus 2 until we generate 4 numbers
 
 
 def arithmetic_generator(a: int, b: int, diff: int) -> list:
-    pass
+    val = []
+    while True:
+        val.append(a)
+        a += diff
+        if len(val) == b: break
+    return val
+
+
+# print(arithmetic_generator(3, 5, 4))
+# print(arithmetic_generator(6, 4, -2))

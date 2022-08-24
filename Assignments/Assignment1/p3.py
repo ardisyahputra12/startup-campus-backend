@@ -20,4 +20,11 @@ Explanation: All numbers are odd, so return 0
 
 
 def even_sum(l: list):
-    pass
+    val = 0
+    for i in l:
+        if i%2 == 0: val += i
+    return val
+
+
+# print(even_sum([0, 2, 3, 4]))
+# print(even_sum([-11, 3, 7]))

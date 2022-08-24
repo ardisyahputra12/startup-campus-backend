@@ -26,4 +26,11 @@ Explanation: Label "score" doesn't exist in labels
 
 
 def find_by_label(labels: list, info: list, query: str):
-    pass
+     val = "Information not available"
+     for label in labels:
+          if query == label: val = info[labels.index(label)]
+     return val
+
+
+# print(find_by_label(["club_name", "score", "captain"], ["manchester united", "4-0", "maguire"], "score"))
+# print(find_by_label(["name", "age", "birthday"], ["jhony", 21, "August 14, 1995"], "score"))

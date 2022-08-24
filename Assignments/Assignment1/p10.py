@@ -64,28 +64,36 @@ Explanation:
 """
 
 
+from math import ceil
+
+
 def summarize_subject_scores(scores: list, subject: str) -> dict:
     """HINTS: you may follow the pseudocode, or feel free to implement your own solution"""
     # create a function to get a dictionary, mapping student name to his/her grade on
     # selected subject, the function should return something like the following
     #   {"name1": grade1, "name2": grade2, ...}
+    average = 0
+    highest_score = 0
+    lowest_score = 0
     student_names_to_grades = map_name_to_grade(scores, subject)
+    grades = [student_names_to_grades[i] for i in student_names_to_grades]
 
-    # calculate average
-    average = None
+    # calculate average, highest score, and lowest score
+    if len(student_names_to_grades) != 0:
+        average = sum(grades) / len(student_names_to_grades)
+        highest_score = max(grades)
+        lowest_score = min(grades)
 
-    # calculate highest score
-    highest_score = None
-    # calculate all students getting the highest score
+    # calculate all students getting the highest score and lowest score
     highest_scorers = get_scorers(student_names_to_grades, highest_score)
-
-    # calculate lowest score
-    lowest_score = None
-    # calculate all students getting the lowest score
     lowest_scorers = get_scorers(student_names_to_grades, lowest_score)
 
     # final formatting
-    return {"average": None, "highest": {}, "lowest": {}}
+    return {
+        "average": ceil(average),
+        "highest": {"score": highest_score, "names": highest_scorers},
+        "lowest": {"score": lowest_score, "names": lowest_scorers}
+    }
 
 
 ##############################################################################################
@@ -95,10 +103,28 @@ def summarize_subject_scores(scores: list, subject: str) -> dict:
 
 def map_name_to_grade(scores: list, subject: str) -> dict:
     """Returns a mapping between student name to his/her score for the given subject"""
-    pass
+    val = {}
+    for i in scores: val[i["name"]] = i[subject]
+    return val
 
 
 def get_scorers(names_to_scores: dict, score: int) -> list:
     """Returns a list of names whose score equal the given score
     and order the result alphabetically."""
-    pass
+    val = [i for i in names_to_scores if names_to_scores[i] == score]
+    val.sort()
+    return val
+
+
+# print(summarize_subject_scores([
+#         {"name": "Santi", "science": 60, "math": 90, "computer": 100},
+#         {"name": "Joko", "science": 50, "math": 90, "computer": 30},
+#         {"name": "Budi", "science": 80, "math": 30, "computer": 30},
+#         {"name": "Beri", "science": 40, "math": 80, "computer": 60}
+#     ], "science"))
+# print(summarize_subject_scores([
+#         {"name": "Santi", "science": 60, "math": 90, "computer": 100},
+#         {"name": "Joko", "science": 50, "math": 90, "computer": 30},
+#         {"name": "Budi", "science": 80, "math": 30, "computer": 30},
+#         {"name": "Beri", "science": 40, "math": 80, "computer": 60}
+#     ], "math"))

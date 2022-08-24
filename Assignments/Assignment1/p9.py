@@ -34,4 +34,14 @@ def kth_place(li: list, k: int):
     - sorting values of an iterable might be useful
     - you can access the last kth element of a list L by using L[-k]
     """
-    pass
+    data = list(set(li))
+    data.sort(reverse=True)
+    val = 0
+    if len(data) >= k:
+        for i in range(k): val = data[i]
+    else: val = f"There are less than {k} unique values"
+    return val
+
+
+# print(kth_place([3,10,12,4,5,10], 3))
+# print(kth_place([12,50,30], 4))

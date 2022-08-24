@@ -54,4 +54,18 @@ def calculate_through_commands(v: int, commands: list) -> int:
           "add" and X = 5, then add current value with 5
         - note that operator "reset" doesn't have a number
     """
-    pass
+    val = v
+    for i in range(len(commands)):
+          cmd = commands[i].split(" ")[0]
+          if len(commands[i].split(" ")) > 1: num = int(commands[i].split(" ")[1])
+          if cmd == "add": val += num
+          elif cmd == "mul": val *= num
+          elif cmd == "sub": val -= num
+          elif cmd == "reset": val = v
+          elif cmd == "stop": return val
+    return val
+
+
+# print(calculate_through_commands(8, ["mul 2", "sub 4"]))
+# print(calculate_through_commands(2, ["add 3", "reset", "sub 2"]))
+# print(calculate_through_commands(-10, ["mul -3", "stop", "sub 2", "add -5"]))

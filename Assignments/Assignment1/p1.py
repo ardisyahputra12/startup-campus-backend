@@ -22,4 +22,10 @@ Output: -1
 
 
 def divide_whole(a: int, b: int) -> int:
-    pass
+    if b == 0: return -1
+    else: return a//b
+
+
+# print(divide_whole(13, 3))
+# print(divide_whole(4, 9))
+# print(divide_whole(7, 0))

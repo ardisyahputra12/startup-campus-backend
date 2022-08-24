@@ -22,4 +22,12 @@ Explanation: 10*9*8*7*6*5*4*3*2*1 = 3628800
 
 
 def factorial(n: int) -> int:
-    pass
+    val = 1
+    if n < 0: val = -1
+    elif n == 0: val = 1
+    for i in range(n, 1, -1): val *= i
+    return val
+
+
+# print(factorial(5))
+# print(factorial(10))

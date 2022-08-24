@@ -39,4 +39,15 @@ def smartest_students(student_grades: dict):
     - you can compare 2 strings with comparison operator (<, > , etc.)
     - iterable that contains comparable objects, can be sorted
     """
-    pass
+    grades = [student_grades[i] for i in student_grades]
+    val = [i for i in student_grades if student_grades[i] == max(grades)]
+    val.sort()
+    if len(val) == len(grades): val = "All are winners"
+    elif len(val) > 1: return val
+    else: return val[0]
+    return val
+
+
+# print(smartest_students({"Alan": 80, "Bishop": 90, "Claire": 80}))
+# print(smartest_students({"Dwight": 80, "Bishop": 70, "Claire": 80}))
+# print(smartest_students({"Alan": 85, "Bishop": 85}))

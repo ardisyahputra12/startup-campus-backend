@@ -151,10 +151,28 @@ def test_p1():
     return score_cases(cases, inputs)
 
 
+@grade("Problem 4")
+def test_p4():
+    from p4 import MyTest
+
+    total_scores = 0
+    total_weights = 15
+
+    # >= 5 cases (3 PTS)
+    if len(MyTest.cases) >= 3:
+        total_scores += 3
+
+        # positive testing (5 PTS)
+
+        # negative testing (7 PTS)
+
+    return total_scores, total_weights
+
+
 ##############################################################################################
 
 if __name__ == "__main__":
-    tests = [test_p1]
+    tests = [test_p1, test_p4]
 
     final_score = 0
     perfect_score = 0

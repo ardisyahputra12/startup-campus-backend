@@ -74,5 +74,5 @@ class Pet:
 # print(pets[1].age(2010))
 #
 # and then run the following comand
-#       python3 p1.py
+#       python3.9 p1.py
 # from within folder Assignment 2

@@ -142,5 +142,5 @@ def cheapest_ride(
 # print(cheapest_ride(vehicles, distance=100, load=180, time_limit=3))
 #
 # and then run the following comand
-#       python3 p3.py
+#       python3.9 p3.py
 # from within folder Assignment 2

@@ -92,5 +92,5 @@ class Student:
 # print(student1.highest_score())  # should return 90
 #
 # and then run the following comand
-#       python3 p2.py
+#       python3.9 p2.py
 # from within folder Assignment 2

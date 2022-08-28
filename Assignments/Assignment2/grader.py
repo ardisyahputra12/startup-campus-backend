@@ -162,6 +162,73 @@ def test_p1():
     return score_cases(cases)
 
 
+@grade("Problem 2")
+def test_p2():
+    from p2 import Student
+
+    global Student
+
+    cases = [
+        {
+            "input": [
+                'Student("Adam", "Smith", grades=[90, 80])',
+                'Student("Bryant", "Lenin", grades=[70, 65.3])',
+                'Student("Claire", "Voy", grades=[72.8, 97.2])',
+            ],
+            "query": [
+                "str(input[0])",
+                "input[0] < input[1]",
+                "input[0] <= input[2]",
+                "str(input[1])",
+                "str(input[2])",
+                "input[0].highest_score()",
+                "input[2].lowest_score()",
+                "input[2] > input[0]",
+            ],
+            "output": [
+                "[Adam Smith] - score: 170",
+                False,
+                True,
+                "[Bryant Lenin] - score: 136",
+                "[Claire Voy] - score: 170",
+                90,
+                72.8,
+                False,
+            ],
+            "weight": [1, 1, 1, 1, 1, 1, 1, 1],
+        },
+        # edge cases
+        {
+            "input": [
+                'Student("Zero", "Void", grades=[])',
+                'Student("Mira", "Twin", grades=[64, 86, 78])',
+                'Student("Prabu", "Twin", grades=[73.8, 87.79, 66.5])',
+            ],
+            "query": [
+                "str(input[0])",
+                "input[1].lowest_score()",
+                "input[1] > input[0]",
+                "input[2] != input[0]",
+                "input[0].highest_score()",
+                "str(input[2])",
+                "input[0].lowest_score()",
+            ],
+            "output": [
+                "[Zero Void] - score: 0",
+                64,
+                True,
+                True,
+                0,
+                "[Prabu Twin] - score: 229",
+                0,
+            ],
+            "weight": [1, 1, 1, 1, 1, 1, 1],
+        },
+    ]
+
+    return score_cases(cases)
+
+
 @grade("Problem 3")
 def test_p3():
     from p3 import Motorbike, Sedan, Truck, cheapest_ride
@@ -303,7 +370,7 @@ def test_p4():
 ##############################################################################################
 
 if __name__ == "__main__":
-    tests = [test_p1, test_p3, test_p4]
+    tests = [test_p1, test_p2, test_p3, test_p4]
 
     final_score = 0
     perfect_score = 0

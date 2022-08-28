@@ -22,7 +22,7 @@ Examples
 ----------------------------------------------------------------------------------------------
 Input: 
     - pet1 = Pet("Charlie", "cat", birth_year=2003)
-    - pet2 = Pet("Dante", "dog", bith_year=2005)
+    - pet2 = Pet("Dante", "dog", birth_year=2005)
     - pet3 = Pet("Simba", "cat")
 
 Query: pet1.name
@@ -62,3 +62,17 @@ class Pet:
 
     def same_type(self, other_pet):
         pass
+
+
+# Test your code by uncommenting the following code and modify accordingly
+# pets = [
+#     Pet("Charlie", "cat", birth_year=2003),
+#     Pet("Dante", "dog", birth_year=2005),
+#     Pet("Simba", "cat"),
+# ]
+# print(pets[0].name)
+# print(pets[1].age(2010))
+#
+# and then run the following comand
+#       python3 p1.py
+# from within folder Assignment 2

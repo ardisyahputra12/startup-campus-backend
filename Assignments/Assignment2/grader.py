@@ -9,6 +9,8 @@ FAILED_CASES = []
 
 
 def score_case(d: dict) -> Union[int, int]:
+    raw_input = d.get("input", [])
+    input = [eval(e) for e in raw_input]  # noqa
     qs = d.get("query", [])
     outs = d.get("output", [])
     weights = d.get("weight", [])
@@ -17,14 +19,15 @@ def score_case(d: dict) -> Union[int, int]:
     total_weights = sum(weights)
 
     for q, out, weight in zip(qs, outs, weights):
+        case = {"input": raw_input, "query": q, "exp": out}
         try:
             res = eval(q)
             if res == out:
                 total_score += weight
             else:
-                FAILED_CASES.append({"query": q, "exp": out, "output": res})
+                FAILED_CASES.append({**case, "output": res})
         except Exception as exc:
-            FAILED_CASES.append({"query": q, "exp": out, "exc": str(exc)})
+            FAILED_CASES.append({**case, "exc": str(exc)})
 
     return total_score, total_weights
 
@@ -48,7 +51,7 @@ def grade(title: str):
     return dec
 
 
-def score_cases(cases: List[dict], inputs: List) -> Union[int, int]:
+def score_cases(cases: List[dict]) -> Union[int, int]:
     total_score = 0
     total_weight = 0
 
@@ -61,29 +64,26 @@ def score_cases(cases: List[dict], inputs: List) -> Union[int, int]:
     # print failed cases
     global FAILED_CASES
     if FAILED_CASES:
-        print("  You failed some test cases!", end="\n\n")
-        var_name, class_name, args_d = inputs
-        print("Input")
-        for index, v in enumerate(args_d):
-            args = [dumps(e) for e in v.get("args", [])]
-            kwargs = [f"{k1}={dumps(v1)}" for k1, v1 in v.get("kwargs", {}).items()]
-            all_args = args + kwargs
-            print(f"  {var_name}[{index}] = {class_name}({', '.join(all_args)})")
-        print()
+        for case in FAILED_CASES:
+            print("  Input:")
+            input = case["input"]
+            for i, e in enumerate(input):
+                print(f"    input[{i}]: {e}")
+            print()
 
-    for case in FAILED_CASES:
-        q = case["query"]
-        print(f"  You failed this test case: {q}")
-        exp_output = case["exp"]
-        exc = case.get("exc")
+            q = case["query"]
+            print(f"  You failed this test case: {q}")
+            exp_output = case["exp"]
+            print("    Your Output: ", end="")
+            exc = case.get("exc")
 
-        print("  Your Output: ", end="")
-        if exc:
-            print(f"RUNTIME ERROR: {exc}")
-        else:
-            user_output = case["output"]
-            print(user_output)
-        print(f"  Expected Output; {exp_output}", end="\n\n")
+            if exc:
+                print(f"RUNTIME ERROR: {exc}")
+            else:
+                user_output = case["output"]
+                print(user_output)
+            print(f"    Expected Output: {exp_output}")
+            print("-" * 100)
 
     # reset to None
     FAILED_CASES = []
@@ -104,54 +104,145 @@ def get_object(cls, arg_d: dict):
 def test_p1():
     from p1 import Pet
 
-    all_args = [
-        {"args": ("Charlie", "cat"), "kwargs": {"birth_year": 2003}},
-        {"args": ("Dante", "dog"), "kwargs": {"birth_year": 2005}},
-        {"args": ("Simba", "cat"), "kwargs": {}},
-        {"args": ("Robin", "bird"), "kwargs": {"birth_year": 2010}},
-        {"args": ("Joy", "dog"), "kwargs": {}},
-    ]
-    global pets
-    pets = [get_object(Pet, arg) for arg in all_args]
-    inputs = ["pets", "Pet", all_args]
+    global Pet
+
     cases = [
         {
+            "input": [
+                'Pet("Charlie", "cat", birth_year=2003)',
+                'Pet("Dante", "dog", birth_year=2005)',
+                'Pet("Simba", "cat")',
+            ],
             "query": [
-                "pets[0].name",
-                "pets[1].type",
-                "pets[1].age(2010)",
-                "pets[2].same_type(pets[0])",
-                "pets[2].age(2022)",
-                "pets[1].same_type(pets[2])",
+                "input[0].name",
+                "input[1].type",
+                "input[1].age(2010)",
+                "input[2].same_type(input[0])",
+                "input[2].age(2022)",
+                "input[1].same_type(input[2])",
             ],
             "output": ["Charlie", "dog", 5, True, 2, False],
             "weight": [1, 1, 1, 1, 1, 1],
         },
         {
+            "input": [
+                'Pet("Dante", "dog", birth_year=2005)',
+                'Pet("Simba", "cat")',
+                'Pet("Robin", "bird", birth_year=2010)',
+                'Pet("Joy", "dog")',
+            ],
             "query": [
-                "pets[3].name",
-                "pets[4].type",
-                "pets[4].age(2022)",
-                "pets[3].age(2013)",
-                "pets[3].same_type(pets[2])",
-                "pets[1].same_type(pets[4])",
+                "input[2].name",
+                "input[3].type",
+                "input[3].age(2022)",
+                "input[2].age(2013)",
+                "input[2].same_type(input[1])",
+                "input[0].same_type(input[3])",
             ],
             "output": ["Robin", "dog", 2, 3, False, True],
             "weight": [1, 1, 1, 1, 1, 1],
         },
         # edge cases
         {
+            "input": [
+                'Pet("Dante", "dog", birth_year=2005)',
+                'Pet("Simba", "cat")',
+                'Pet("Robin", "bird", birth_year=2010)',
+            ],
             "query": [
-                "pets[3].same_type(pets[3])",
-                "pets[1].age(2005)",
-                "pets[2].age(2019)",
+                "input[2].same_type(input[2])",
+                "input[0].age(2005)",
+                "input[1].age(2019)",
             ],
             "output": [True, 0, "Not applicable"],
             "weight": [1, 1, 1],
         },
     ]
 
-    return score_cases(cases, inputs)
+    return score_cases(cases)
+
+
+@grade("Problem 3")
+def test_p3():
+    from p3 import Motorbike, Sedan, Truck, cheapest_ride
+
+    global Motorbike, Sedan, Truck, cheapest_ride
+
+    cases = [
+        {
+            "input": [
+                'Motorbike("M1", 40)',
+                'Sedan("Ruby", 200)',
+                'Truck("Kargo", 2000)',
+            ],
+            "query": [
+                "cheapest_ride(input, distance=100, load=100, time_limit=2)",
+                "cheapest_ride(input, distance=100, load=180, time_limit=3)",
+                "cheapest_ride(input, distance=10, load=5, time_limit=0.5)",
+                "cheapest_ride(input, distance=10, load=5, time_limit=0.1)",
+            ],
+            "output": ["Ruby", "Ruby", "M1", "Impossible"],
+            "weight": [1, 1, 1, 1],
+        },
+        {
+            "input": [
+                'Motorbike("M1", 40)',
+                'Motorbike("M2", 60)',
+                'Motorbike("M3", 100)',
+                'Sedan("Mini", 100)',
+                'Sedan("Ruby", 200)',
+                'Sedan("Gianto", 600)',
+                'Truck("Tiny", 600)',
+                'Truck("Kargo", 2000)',
+            ],
+            "query": [
+                "cheapest_ride(input, distance=101, load=2000, time_limit=4)",
+                "cheapest_ride(input, distance=100, load=2000, time_limit=4)",
+                "cheapest_ride(input, distance=78, load=600, time_limit=2)",
+                "cheapest_ride(input, distance=80, load=500, time_limit=2)",
+                "cheapest_ride(input, distance=104, load=200, time_limit=2)",
+                "cheapest_ride(input, distance=104, load=200, time_limit=1.9)",
+                "cheapest_ride(input, distance=112, load=100, time_limit=1.99)",
+                "cheapest_ride(input, distance=88, load=100, time_limit=1.99)",
+                "cheapest_ride(input, distance=88, load=100, time_limit=2)",
+                "cheapest_ride(input, distance=80, load=100, time_limit=1.99)",
+                "cheapest_ride(input, distance=80, load=100, time_limit=2)",
+                "cheapest_ride(input, distance=80, load=100, time_limit=2)",
+            ],
+            "output": [
+                "Impossible",
+                "Kargo",
+                "Kargo",
+                "Gianto",
+                "Gianto",
+                "Impossible",
+                "Impossible",
+                "Gianto",
+                "Gianto",
+                "Gianto",
+                "M3",
+            ],
+            "weight": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        },
+        {
+            "input": [
+                'Motorbike("Rouge", 100)',
+                'Sedan("Bellamy", 80)',
+                'Truck("Dragon", 1000)',
+            ],
+            "query": [
+                "cheapest_ride(input, distance=45, load=100, time_limit=1)",
+                "cheapest_ride(input, distance=40, load=100, time_limit=0.99)",
+                "cheapest_ride(input, distance=40, load=100, time_limit=1)",
+                "cheapest_ride(input, distance=57, load=80, time_limit=1.2)",
+                "cheapest_ride(input, distance=0, load=1001, time_limit=1)",
+            ],
+            "output": ["Impossible", "Dragon", "Rouge", "Bellamy", "Impossible"],
+            "weight": [1, 1, 1, 1, 1],
+        },
+    ]
+
+    return score_cases(cases)
 
 
 @grade("Problem 4")
@@ -212,7 +303,7 @@ def test_p4():
 ##############################################################################################
 
 if __name__ == "__main__":
-    tests = [test_p1, test_p4]
+    tests = [test_p1, test_p3, test_p4]
 
     final_score = 0
     perfect_score = 0

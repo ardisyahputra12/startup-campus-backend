@@ -1,60 +1,55 @@
-# Basic unit testing
+# Crafting your test cases.
 #
-# Implement a logic in several way
-# Check that student can create a test to cover cases.
-# From our side, we will create
-# - several false implementations (mesti ada yang salah 1)
-# - 1 correct implementation (semua test case mesti bener)
+# You are given the task to test a function find_smallest, which behaves as follows:
+#   - return the smallest POSITIVE integer in a list
+#   - if the list doesn't contain any POSITIVE integers, return -1
 #
-# Misal:
-#   find_smallest is a function to find the smallest positive integer in a list; if the list
-#   doesn't contain any positive integers, return -1
+# The test method is already written for you. However, the test cases are not complete yet.
+# You need to write at least 5 test cases, and you test cases must cover 3 false
+# implementations that are already prepared.
 #
-# False attempt 1:
-# def find_smallest(l: list):
-#   return min(l) --> bakal salah kalau l mengandung angka non-positif
-#
-# False attempt 2:
-# def find_smallest(l: list):
-#   result = 1
-#   for e in l:
-#       if e < 0:        --> bakal salah kalau l mengandung 0, karena bakal return 0
-#           continue
-#       if result > e:
-#         result = e
-#
-#
-
+# Grading scheme:
+# - # of TEST CASES: >= 5 test-cases (1 point per test case, up to 5 pts), must be unique
+#       (you can't simply copy paste a case, it will be detected by the grader)
+# - POSITIVE TESTING: all (unique) test cases must pass the assertion for correct
+#       implementation of find_smallest (4 pts * proportion of valid cases)
+#       e.g. if you input 5 unique cases, and 3 pass the test, then your score is
+#       4 * (3/5) = 2.4 pts
+# - NEGATIVE TESTING: test cases must have fail assertion on each of 3 false implementations
+#       (+2 pts if your test cases cover 1 false implementation, up to 6 pts)
 
 from unittest import TestCase
 
-# this is the correct implementation
+
+# DO NOT EDIT THIS METHOD
+# correct implementation
 def find_smallest(l: list):
-    # find the minimal positive integer
-    res = min([e for e in l if e > 0])
-    if res:
-        return res
-
-    # if no positive integers is found in the list
-    return -1
+    positive_numbers = [e for e in l if e > 0]
+    if not positive_numbers:
+        return -1
+    return min(positive_numbers)
 
 
-class MyTest(TestCase):
-    # you must satisfy the following:
-    # - have at least 3 test-cases (3 points)
-    # - all assertions must be valid when using the correct implementation (5 points)
-    # - test case must have fail assertion on false implementations (7 points)
+class FindSmallestTest(TestCase):
     cases = [
-        # Test Case 1
-        {"args": [3, 1, 2], "expected": 1}
-        # continue below
+        # Test Case 1, feel free to uncomment the following line
+        # {"l": [3, 1, 2], "expected": 1},
+        # More test cases below
+        # {"l": [...], "expected": ...}
     ]
 
-    def test_find_smallest(self):
+    # DO NOT EDIT THIS METHOD
+    def test_valid(self):
         for case in self.cases:
-            self.assertEqual(find_smallest(case["args"]), case["expected"])
+            self.assertEqual(find_smallest(case["l"]), case["expected"])
 
 
-# run this file by:
+# Test your cases by following these steps:
 #   cd to Assignment2 folder
 #   python3.9 -m unittest -v p4.py
+
+
+# HINTS:
+# - if you got stuck when creating test cases, check out the code for false implementations
+#       in functions/find_smallest.py
+# - think about edge cases carefully and re-read the problem description if necessary

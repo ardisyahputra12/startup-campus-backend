@@ -36,13 +36,11 @@ def grade(title: str):
     def dec(f: callable):
         @wraps(f)
         def dec2(*args, **kwargs):
+            print("=" * 100)
             print(f"Grading {title}...")
             total_score, total_weights = f(*args, **kwargs)
 
-            print(
-                f"Your score for {title}: {total_score} out of {total_weights}",
-                end="\n\n",
-            )
+            print(f"\nYour score for {title}: {total_score} out of {total_weights}")
 
             return total_score, total_weights
 
@@ -64,7 +62,9 @@ def score_cases(cases: List[dict]) -> Union[int, int]:
     # print failed cases
     global FAILED_CASES
     if FAILED_CASES:
-        for case in FAILED_CASES:
+        print("  Displaying several failed cases...\n")
+        # only display first 3 failed cases
+        for case in FAILED_CASES[:3]:
             print("  Input:")
             input = case["input"]
             for i, e in enumerate(input):
@@ -332,21 +332,21 @@ def test_p4():
     cases = [loads(case) for case in cases]
 
     # positive testing (max: 4 PTS)
-    print("[Positive Testing]")
+    print("  [Positive Testing]")
     valid_cases = 0
     for index, case in enumerate(cases, 1):
         try:
             assert find_smallest(case["l"]) == case["expected"]
             valid_cases += 1
         except Exception:
-            print(f"  Fails test for case #{index}")
+            print(f"    Fails test for case #{index}")
             pass
     tmp = 4 * valid_cases / case_len if case_len else 0
     print(f"  {valid_cases}/{case_len} cases are valid: {tmp} pts")
     total_scores += tmp
 
     # negative testing (max: 6 PTS)
-    print("[Negative Testing]")
+    print("  [Negative Testing]")
     tmp = 0
     false_functions = (f1, f2, f3)
     for index, f in enumerate(false_functions):
@@ -360,17 +360,69 @@ def test_p4():
                     tmp += 1
             finally:
                 if not found_fail_assertions:
-                    print(f"  Fail to cover false implementation #{index+1}")
-    print(f"  Your test cases cover {tmp} false implementation(s): {tmp*2} pts")
+                    print(f"    Fail to cover false implementation #{index+1}")
+    print(f"    Your test cases cover {tmp} false implementation(s): {tmp*2} pts")
     total_scores += 2 * tmp
 
     return total_scores, total_weights
 
 
+@grade("Problem 5")
+def test_p5():
+    from functions.the_lucky_winner import f1, f2, f3, f4
+    from p5 import LuckyWinnerTest
+
+    total_scores = 0
+    total_weights = 15
+
+    # positive testing
+    print("  [Positive Testing]")
+    try:
+        LuckyWinnerTest().test_valid()
+        total_scores += 3
+        print("    Passed all assertions for the correct implementation (3 pts)")
+    except Exception as e:
+        print(
+            f"    Some of your test cases fail to test the correct implementation: {e}"
+        )
+
+    # negative testing (max: 12 PTS)
+    if total_scores > 0:
+        print("  [Negative Testing]")
+        tmp = 0
+        false_functions = (f1, f2, f3, f4)
+        for index, f in enumerate(false_functions):
+            with patch("p5.the_lucky_winner", f):
+                found_fail_assertions = False
+                try:
+                    LuckyWinnerTest().test_valid()
+                except Exception as e:
+                    if isinstance(e, AssertionError):
+                        found_fail_assertions = True
+                        tmp += 1
+                finally:
+                    if not found_fail_assertions:
+                        print(f"    Fail to cover false implementation #{index+1}")
+        print(f"    Your test cases cover {tmp} false implementation(s): {tmp*3} pts")
+        total_scores += tmp * 3
+    else:
+        print(
+            f"\n  Skip checking false implementations, please make sure your test cases"
+            " cover the correct implementation (Positive Testing)"
+        )
+
+    return total_scores, total_weights
+
+
+# @grade("Problem 6")
+# def test_p6():
+#     return 0, 25
+
+
 ##############################################################################################
 
 if __name__ == "__main__":
-    tests = [test_p1, test_p2, test_p3, test_p4]
+    tests = [test_p1, test_p2, test_p3, test_p4, test_p5]
 
     final_score = 0
     perfect_score = 0
@@ -380,4 +432,6 @@ if __name__ == "__main__":
         perfect_score += total_weight
 
     perc = round(final_score / perfect_score * 100, 1)
-    print(f"Your grade for Assignment 2 is {final_score}/{perfect_score} ({perc}%)")
+    print("=" * 100 + "\n")
+    print(f"YOUR GRADE FOR ASSIGNMENT 2: {final_score}/{perfect_score} ({perc}%)\n")
+    print("=" * 100)

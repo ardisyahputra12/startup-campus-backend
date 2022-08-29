@@ -31,7 +31,7 @@ Explanation: pet1.name refers to the name of the 1st pet, which is "Charlie"
 
 Query: pet2.type
 Output: "dog"
-Explanation: pet2.name refers to the type of the 2nd pet, which is "dog"
+Explanation: pet2.type refers to the type of the 2nd pet, which is "dog"
 
 Query: pet2.age(2010)
 Output: 5

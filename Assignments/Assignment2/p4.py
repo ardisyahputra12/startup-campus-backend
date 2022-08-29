@@ -1,22 +1,31 @@
-# Crafting your test cases.
-#
-# You are given the task to test a function find_smallest, which behaves as follows:
-#   - return the smallest POSITIVE integer in a list
-#   - if the list doesn't contain any POSITIVE integers, return -1
-#
-# The test method is already written for you. However, the test cases are not complete yet.
-# You need to write at least 5 test cases, and you test cases must cover 3 false
-# implementations that are already prepared.
-#
-# Grading scheme:
-# - # of TEST CASES: >= 5 test-cases (1 point per test case, up to 5 pts), must be unique
-#       (you can't simply copy paste a case, it will be detected by the grader)
-# - POSITIVE TESTING: all (unique) test cases must pass the assertion for correct
-#       implementation of find_smallest (4 pts * proportion of valid cases)
-#       e.g. if you input 5 unique cases, and 3 pass the test, then your score is
-#       4 * (3/5) = 2.4 pts
-# - NEGATIVE TESTING: test cases must have fail assertion on each of 3 false implementations
-#       (+2 pts if your test cases cover 1 false implementation, up to 6 pts)
+"""
+Crafting your test cases.
+
+You are given the task to test a function "find_smallest", which should behave as follows:
+  - return the smallest POSITIVE integer in a list
+  - if the list doesn't contain any POSITIVE integers, return -1
+
+Example for correct implementation of "find_smallest"
+----------------------------------------------------------------------------------------------
+Input: l = [3, 1, 2]
+Output: 1
+Explanation: The smallest integer in l is 1, and it's also positive so return 1
+----------------------------------------------------------------------------------------------
+
+As tester, you do not need to care about how the function is implemented. The main problem is
+that test cases are not complete yet. You need to write at least 5 valid test cases, and your
+test cases must cover 3 false implementations that are already prepared.
+
+Grading scheme:
+- # of TEST CASES: >= 5 test-cases (1 point per test case, up to 5 pts), must be unique
+      (you can't simply copy paste a case, it will be detected by the grader)
+- POSITIVE TESTING: all (unique) test cases must pass the assertion for correct
+      implementation of find_smallest (4 pts * proportion of valid cases)
+      e.g. if you input 5 unique cases, and 3 pass the test, then your score is
+      4 * (3/5) = 2.4 pts
+- NEGATIVE TESTING: test cases must have fail assertion on each of 3 false implementations
+      (+2 pts if your test cases cover 1 false implementation, up to 6 pts)
+"""
 
 from unittest import TestCase
 

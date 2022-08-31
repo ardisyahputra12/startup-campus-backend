@@ -59,6 +59,7 @@ class Student:
         self.last_name = last_name
         self.grades = grades
         self.total_score = ceil(sum(grades))
+        if len(grades) == 0: self.grades = [0]
 
     # override this to print
     # return string in the format of "[<first_name> <last_name>] - score: <total_score>"
@@ -77,13 +78,11 @@ class Student:
 
     # implement this
     def highest_score(self) -> float:
-        if len(self.grades) > 1: return max(self.grades)
-        else: return 0
+        return max(self.grades)
 
     # implement this
     def lowest_score(self) -> float:
-        if len(self.grades) > 1: return min(self.grades)
-        else: return 0
+        return min(self.grades)
 
     # feel free to add other helper methods
 

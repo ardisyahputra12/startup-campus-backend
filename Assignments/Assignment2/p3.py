@@ -114,23 +114,54 @@ class Vehicle:
     #
     # you can apply the concept of inheritance to simplify the implementation
 
+    def time(self, distance, average_speed):
+       return distance/average_speed
+
 
 class Motorbike(Vehicle):
-    pass
+    def fuel_cost(self, distance):
+        return 120 * distance
+
+    def average_speed(self, load):
+        return 50 - (load/10)
 
 
 class Sedan(Vehicle):
-    pass
+    def fuel_cost(self, distance):
+        return 200 * distance
+
+    def average_speed(self, load):
+        return 60 - (load/25)
 
 
 class Truck(Vehicle):
-    pass
+    def fuel_cost(self, distance):
+        return 400 * distance
+
+    def average_speed(self, load):
+        return 45 - (load/100)
 
 
 def cheapest_ride(
     vehicles: List[Vehicle], distance: int, load: int, time_limit: float
 ) -> str:
-    pass
+    cost = []
+    name = []
+    capacity = []
+    capacity_based_cost = []
+    for vehicle in vehicles:
+        if (vehicle.average_speed(load) != 0) and (vehicle.time(distance, vehicle.average_speed(load)) <= time_limit) and (vehicle.time(distance, vehicle.average_speed(load)) > 0):
+            cost.append(vehicle.fuel_cost(distance))
+            name.append(vehicle.name)
+            capacity.append(vehicle.capacity)
+    if len(name) < 1: return "Impossible"
+    elif len(name) == 1: return name[0]
+    else:
+        for i in range(len(cost)):
+            if cost[cost.index(min(cost))] == cost[i]:
+                capacity_based_cost.append(capacity[i])
+        if len(capacity_based_cost) > 1: return name[capacity.index(max(capacity_based_cost))]
+        else: return name[cost.index(min(cost))]
 
 
 # Test your code by uncommenting the following code and modify accordingly
@@ -141,6 +172,13 @@ def cheapest_ride(
 # ]
 # print(cheapest_ride(vehicles, distance=100, load=100, time_limit=2))
 # print(cheapest_ride(vehicles, distance=100, load=180, time_limit=3))
+#
+# vehicles = [
+#     Motorbike("Rouge", 100),
+#     Sedan("Bellamy", 80),
+#     Truck("Dragon", 1000)
+# ]
+# print(cheapest_ride(vehicles, distance=40, load=100, time_limit=0.99)) # Dragon   --> Bellamy
 #
 # and then run the following comand
 #       python3.9 p3.py

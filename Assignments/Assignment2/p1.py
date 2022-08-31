@@ -54,14 +54,17 @@ Explanation: pet2 is a dog, while pet3 is a cat; so return False
 
 
 class Pet:
-    def __init__(self, name: str, type: str, birth_year: int = None):
-        pass
+    def __init__(self, name: str, type: str, birth_year: int = 2020):
+        self.name = name
+        self.type = type
+        self.birth_year = birth_year
 
     def age(self, year: int):
-        pass
+        if year < self.birth_year: return "Not applicable"
+        else: return year - self.birth_year
 
     def same_type(self, other_pet):
-        pass
+        return self.type == other_pet.type
 
 
 # Test your code by uncommenting the following code and modify accordingly
@@ -72,6 +75,7 @@ class Pet:
 # ]
 # print(pets[0].name)
 # print(pets[1].age(2010))
+# print(pets[2].same_type(pets[1]))
 #
 # and then run the following comand
 #       python3.9 p1.py

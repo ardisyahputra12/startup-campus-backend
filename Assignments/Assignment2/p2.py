@@ -49,35 +49,41 @@ Output: 90
 Explanation: student1 has 2 grades: 90, 80, so return the highest one: 90
 """
 from functools import total_ordering
+from math import ceil
 
 
 @total_ordering
 class Student:
     def __init__(self, first_name: str, last_name: str, grades: list):
-        pass
+        self.first_name = first_name
+        self.last_name = last_name
+        self.grades = grades
+        self.total_score = ceil(sum(grades))
 
     # override this to print
     # return string in the format of "[<first_name> <last_name>] - score: <total_score>"
     def __str__(self):
-        pass
+        return f"[{self.first_name} {self.last_name}] - score: {self.total_score}"
 
     # implement this to compare this Student and other student
     # returns True if and only if both students have the same
     def __eq__(self, other_student: object) -> bool:
-        pass
+        return self.total_score == other_student.total_score
 
     # implement this
     # returns True if and only if this student has lower score than other student
     def __lt__(self, other_student: object) -> bool:
-        pass
+        return self.total_score < other_student.total_score
 
     # implement this
     def highest_score(self) -> float:
-        pass
+        if len(self.grades) > 1: return max(self.grades)
+        else: return 0
 
     # implement this
     def lowest_score(self) -> float:
-        pass
+        if len(self.grades) > 1: return min(self.grades)
+        else: return 0
 
     # feel free to add other helper methods
 
@@ -86,10 +92,12 @@ class Student:
 # student1 = Student("Adam", "Smith", grades=[90, 80])
 # student2 = Student("Bryant", "Lenin", grades=[70, 65.3])
 # student3 = Student("Claire", "Voy", grades=[72.8, 97.2])
-#
+# student4 = Student("", "", grades=[])
+
 # print(student1)
 # print(student1 < student2)  # should return False
 # print(student1.highest_score())  # should return 90
+# print(student4.total_score)
 #
 # and then run the following comand
 #       python3.9 p2.py

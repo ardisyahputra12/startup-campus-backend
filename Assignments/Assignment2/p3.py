@@ -104,7 +104,8 @@ from typing import List
 
 class Vehicle:
     def __init__(self, name: str, capacity: int):
-        pass
+        self.name = name
+        self.capacity = capacity
 
     # HINT:
     # For each child class, you want to have:

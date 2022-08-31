@@ -12,9 +12,16 @@ before_script:
   - python3.9 -m venv $ENVIRONMENT_NAME
   - source $ENVIRONMENT_NAME/bin/activate
 
-grade-assignment1:
+# grade-assignment1:
+#   stage: grade
+#   script:
+#     - pwd && ls # for debugging
+#     - cd Assignments/Assignment1
+#     - python3.9 -m grader
+
+grade-assignment2:
   stage: grade
   script:
     - pwd && ls # for debugging
-    - cd Assignments/Assignment1
+    - cd Assignments/Assignment2
     - python3.9 -m grader

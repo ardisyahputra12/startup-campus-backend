@@ -115,7 +115,7 @@ class Vehicle:
     # you can apply the concept of inheritance to simplify the implementation
 
     def time(self, distance, average_speed):
-       return distance/average_speed
+        return distance/average_speed
 
 
 class Motorbike(Vehicle):
@@ -145,23 +145,31 @@ class Truck(Vehicle):
 def cheapest_ride(
     vehicles: List[Vehicle], distance: int, load: int, time_limit: float
 ) -> str:
-    cost = []
-    name = []
-    capacity = []
-    capacity_based_cost = []
-    for vehicle in vehicles:
-        if (vehicle.average_speed(load) != 0) and (vehicle.time(distance, vehicle.average_speed(load)) <= time_limit) and (vehicle.time(distance, vehicle.average_speed(load)) > 0):
-            cost.append(vehicle.fuel_cost(distance))
-            name.append(vehicle.name)
-            capacity.append(vehicle.capacity)
-    if len(name) < 1: return "Impossible"
-    elif len(name) == 1: return name[0]
+    # ----------------------------------- SOLUTION 1 -----------------------------------
+    # cost, name, capacity = [], [], []
+    # for vehicle in vehicles:
+    #     if (vehicle.average_speed(load) != 0) and (vehicle.time(distance, vehicle.average_speed(load)) <= time_limit) and (vehicle.time(distance, vehicle.average_speed(load)) > 0) and (vehicle.capacity >= load):
+    #         cost.append(vehicle.fuel_cost(distance))
+    #         name.append(vehicle.name)
+    #         capacity.append(vehicle.capacity)
+    # if len(name) < 1: return "Impossible"
+    # elif len(name) == 1: return name[0]
+    # else:
+    #     capacity_based_cost = [capacity[i] for i in range(len(cost)) if cost[cost.index(min(cost))] == cost[i]]
+    #     if len(capacity_based_cost) > 1: return name[capacity.index(max(capacity_based_cost))]
+    #     else: return name[cost.index(min(cost))]
+
+
+    # ----------------------------------- SOLUTION 2 -----------------------------------
+    val = []
+    cheapest = [[vehicle.fuel_cost(distance), vehicle.name, vehicle.capacity] for vehicle in vehicles if (vehicle.average_speed(load) != 0) and (vehicle.time(distance, vehicle.average_speed(load)) <= time_limit) and (vehicle.time(distance, vehicle.average_speed(load)) > 0) and (vehicle.capacity >= load)]
+    if len(cheapest) < 1: return "Impossible"
+    elif len(cheapest) == 1: return cheapest[0][1]
     else:
-        for i in range(len(cost)):
-            if cost[cost.index(min(cost))] == cost[i]:
-                capacity_based_cost.append(capacity[i])
-        if len(capacity_based_cost) > 1: return name[capacity.index(max(capacity_based_cost))]
-        else: return name[cost.index(min(cost))]
+        capacity_based_cost = [val[2] for val in cheapest if min([val[0] for val in cheapest]) == val[0]]
+        if len(capacity_based_cost) > 1: val = [val[1] for val in cheapest if (max(capacity_based_cost) == val[2]) and (min([val[0] for val in cheapest]) == val[0])]
+        else: val = [val[1] for val in cheapest if min([val[0] for val in cheapest]) == val[0]]
+    return val[0]
 
 
 # Test your code by uncommenting the following code and modify accordingly
@@ -178,7 +186,7 @@ def cheapest_ride(
 #     Sedan("Bellamy", 80),
 #     Truck("Dragon", 1000)
 # ]
-# print(cheapest_ride(vehicles, distance=40, load=100, time_limit=0.99)) # Dragon   --> Bellamy
+# print(cheapest_ride(vehicles, distance=40, load=100, time_limit=0.99))  # Dragon   --> Bellamy
 #
 # and then run the following comand
 #       python3.9 p3.py

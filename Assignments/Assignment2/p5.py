@@ -56,9 +56,9 @@ Grading scheme:
 - Write your assertions in test_valid (max: 15 pts) 
     - all the assertions must be passed for the correct implementation (+3 pts)
     - some of the assertions must fail for the false implmentations (+3 pts each)
-    - if you fail to test the correct implementation, then you will NOT get any point for
-      correctly covering any of the false implementations, so PLEASE make sure that your test
-      cases are valid first
+- If you fail to test the correct implementation, then you will NOT get any point for 
+  correctly covering any of the false implementations, so PLEASE make sure that your test
+  cases are valid first
 """
 # DO NOT EDIT
 from unittest import TestCase

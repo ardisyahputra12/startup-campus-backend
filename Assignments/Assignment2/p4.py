@@ -25,6 +25,9 @@ Grading scheme:
       4 * (3/5) = 2.4 pts
 - NEGATIVE TESTING: test cases must have fail assertion on each of 3 false implementations
       (+2 pts if your test cases cover 1 false implementation, up to 6 pts)
+- If you fail to test the correct implementation, then you will NOT get any point for 
+  correctly covering any of the false implementations, so PLEASE make sure that your test
+  cases are valid first
 """
 
 from unittest import TestCase

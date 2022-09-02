@@ -67,7 +67,7 @@ class Student:
         return f"[{self.first_name} {self.last_name}] - score: {self.total_score}"
 
     # implement this to compare this Student and other student
-    # returns True if and only if both students have the same
+    # returns True if and only if both students have the same score
     def __eq__(self, other_student: object) -> bool:
         return self.total_score == other_student.total_score
 

@@ -339,30 +339,36 @@ def test_p4():
             assert find_smallest(case["l"]) == case["expected"]
             valid_cases += 1
         except Exception:
-            print(f"    Fails test for case #{index}")
+            print(f"    Fails test for this case: {case}")
             pass
     tmp = 4 * valid_cases / case_len if case_len else 0
     print(f"  {valid_cases}/{case_len} cases are valid: {tmp} pts")
     total_scores += tmp
 
     # negative testing (max: 6 PTS)
-    print("  [Negative Testing]")
-    tmp = 0
-    false_functions = (f1, f2, f3)
-    for index, f in enumerate(false_functions):
-        with patch("p4.find_smallest", f):
-            found_fail_assertions = False
-            try:
-                FindSmallestTest().test_valid()
-            except Exception as e:
-                if isinstance(e, AssertionError):
-                    found_fail_assertions = True
-                    tmp += 1
-            finally:
-                if not found_fail_assertions:
-                    print(f"    Fail to cover false implementation #{index+1}")
-    print(f"    Your test cases cover {tmp} false implementation(s): {tmp*2} pts")
-    total_scores += 2 * tmp
+    if valid_cases == case_len:
+        print("  [Negative Testing]")
+        tmp = 0
+        false_functions = (f1, f2, f3)
+        for index, f in enumerate(false_functions):
+            with patch("p4.find_smallest", f):
+                found_fail_assertions = False
+                try:
+                    FindSmallestTest().test_valid()
+                except Exception as e:
+                    if isinstance(e, AssertionError):
+                        found_fail_assertions = True
+                        tmp += 1
+                finally:
+                    if not found_fail_assertions:
+                        print(f"    Fail to cover false implementation #{index+1}")
+        print(f"    Your test cases cover {tmp} false implementation(s): {tmp*2} pts")
+        total_scores += 2 * tmp
+    else:
+        print(
+            f"\n  Skip checking false implementations, please make sure your test cases"
+            " cover the correct implementation (Positive Testing)"
+        )
 
     return total_scores, total_weights
 
@@ -375,16 +381,19 @@ def test_p5():
     total_scores = 0
     total_weights = 15
 
+    import traceback
+
     # positive testing
     print("  [Positive Testing]")
     try:
-        LuckyWinnerTest().test_valid()
+        with patch("unittest.TestCase.assertEqual") as mock:
+            LuckyWinnerTest().test_valid()
+        mock.assert_called()
         total_scores += 3
         print("    Passed all assertions for the correct implementation (3 pts)")
     except Exception as e:
-        print(
-            f"    Some of your test cases fail to test the correct implementation: {e}"
-        )
+        print(f"    Some of your test cases fail to test the correct implementation\n")
+        print(traceback.format_exc())
 
     # negative testing (max: 12 PTS)
     if total_scores > 0:
@@ -407,7 +416,7 @@ def test_p5():
         total_scores += tmp * 3
     else:
         print(
-            f"\n  Skip checking false implementations, please make sure your test cases"
+            f"  Skip checking false implementations, please make sure your test cases"
             " cover the correct implementation (Positive Testing)"
         )
 

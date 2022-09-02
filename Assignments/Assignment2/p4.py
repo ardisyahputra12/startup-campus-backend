@@ -45,9 +45,12 @@ def find_smallest(l: list):
 class FindSmallestTest(TestCase):
     cases = [
         # Test Case 1, feel free to uncomment the following line
-        # {"l": [3, 1, 2], "expected": 1},
+        {"l": [3, 1, 2], "expected": 1},
         # More test cases below
-        # {"l": [...], "expected": ...}
+        {"l": [4, 0, 1], "expected": 1},
+        {"l": [0, 0, 0], "expected": -1},
+        {"l": [-1, 0.99, 1], "expected": 0.99},
+        {"l": [], "expected": -1},
     ]
 
     # DO NOT EDIT THIS METHOD

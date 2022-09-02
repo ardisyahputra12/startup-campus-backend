@@ -62,7 +62,7 @@ class Student:
         pass
 
     # implement this to compare this Student and other student
-    # returns True if and only if both students have the same
+    # returns True if and only if both students have the same score
     def __eq__(self, other_student: object) -> bool:
         pass
 

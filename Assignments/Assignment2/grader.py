@@ -381,16 +381,19 @@ def test_p5():
     total_scores = 0
     total_weights = 15
 
+    import traceback
+
     # positive testing
     print("  [Positive Testing]")
     try:
-        LuckyWinnerTest().test_valid()
+        with patch("unittest.TestCase.assertEqual") as mock:
+            LuckyWinnerTest().test_valid()
+        mock.assert_called()
         total_scores += 3
         print("    Passed all assertions for the correct implementation (3 pts)")
     except Exception as e:
-        print(
-            f"    Some of your test cases fail to test the correct implementation: {e}"
-        )
+        print(f"    Some of your test cases fail to test the correct implementation\n")
+        print(traceback.format_exc())
 
     # negative testing (max: 12 PTS)
     if total_scores > 0:
@@ -413,7 +416,7 @@ def test_p5():
         total_scores += tmp * 3
     else:
         print(
-            f"\n  Skip checking false implementations, please make sure your test cases"
+            f"  Skip checking false implementations, please make sure your test cases"
             " cover the correct implementation (Positive Testing)"
         )
 

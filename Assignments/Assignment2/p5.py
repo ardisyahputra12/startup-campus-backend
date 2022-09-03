@@ -69,8 +69,22 @@ from functions.the_lucky_winner import the_lucky_winner
 
 class LuckyWinnerTest(TestCase):
     # please implement this
+
+    # This only cover the correct implementation
+    # {"in": {"name": ["Abdul", "Modena", "Zeno"], "lottery_number": [17, 35, 99], "N": 69}, "out": "Abdul"},
+
+    # This will cover correct and false implementation
+        # This cover the correct implementation and 1 of false implementation
+    # {"in": {"name": ["Abdul", "Zeno", "Zeno"], "lottery_number": [17, 35, 99], "N": 70}, "out": "Found duplicate participants"},
+        # This cover the correct implementation and 3 of false implementation
+    # {"in": {"name": ["Abdul", "Zeno", "Zeno"], "lottery_number": [35, 35, 99], "N": 70}, "out": "Found duplicate numbers"},
+
+    # This will cover correct and false implementation
+    # {"in": {"name": ["Abdul", "Modena", "Zeno"], "lottery_number": [17, 35, 99], "N": 70}, "out": "No winner this time"},
+    # {"in": {"name": ["Abdul", "Modena", "Zeno"], "lottery_number": [17, 35, 99], "N": 1001}, "out": "Lottery number can't be bigger than 1000"},
+
     def test_valid(self):
-        pass
+        self.assertEqual(the_lucky_winner(["Abdul", "Modena", "Zeno"], [17, 35, 99], 1001), "Lottery number can't be bigger than 1000")
 
 
 # Test your positive cases by following these steps:

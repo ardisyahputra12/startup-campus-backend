@@ -16,14 +16,14 @@ def f2(l: list):
 
 def f3(l: list):
     # find 1st positive integer in the list
-    result = None
-    for e in l:
-        if result is None:
-            result = e
+    try:
+        result = l[0]
+        for e in l[1:]:
+            if e <= 0:
+                continue
+            elif result < 0 or e < result:
+                result = e
 
-        if e <= 0:
-            continue
-        elif e < result:
-            result = e
-
-    return result if result > 0 else -1
+        return result if result > 0 else -1
+    except Exception:
+        return 0

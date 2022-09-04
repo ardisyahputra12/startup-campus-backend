@@ -69,22 +69,55 @@ from functions.the_lucky_winner import the_lucky_winner
 
 class LuckyWinnerTest(TestCase):
     # please implement this
-
-    # This only cover the correct implementation
-    # {"in": {"name": ["Abdul", "Modena", "Zeno"], "lottery_number": [17, 35, 99], "N": 69}, "out": "Abdul"},
-
-    # This will cover correct and false implementation
-        # This cover the correct implementation and 1 of false implementation
-    # {"in": {"name": ["Abdul", "Zeno", "Zeno"], "lottery_number": [17, 35, 99], "N": 70}, "out": "Found duplicate participants"},
-        # This cover the correct implementation and 3 of false implementation
-    # {"in": {"name": ["Abdul", "Zeno", "Zeno"], "lottery_number": [35, 35, 99], "N": 70}, "out": "Found duplicate numbers"},
-
-    # This will cover correct and false implementation
-    # {"in": {"name": ["Abdul", "Modena", "Zeno"], "lottery_number": [17, 35, 99], "N": 70}, "out": "No winner this time"},
-    # {"in": {"name": ["Abdul", "Modena", "Zeno"], "lottery_number": [17, 35, 99], "N": 1001}, "out": "Lottery number can't be bigger than 1000"},
+    cases = [
+        {
+            # for false imp. #1
+            "in": [
+                ["Abdul", "Zeno", "Zeno"],
+                [17, 35, 99],
+                70
+            ],
+            "out": "Found duplicate participants"
+        },
+        {
+            # for false imp. #2
+            "in": [
+                ["Abdul", "Modena", "Zeno"],
+                [35, 35, 99],
+                70
+            ],
+            "out": "Found duplicate numbers"
+        },
+        {
+            # for false imp. #3
+            "in": [
+                ["Abdul", "Modena", "Zeno"],
+                [17, 35, 99],
+                1001
+            ],
+            "out": "No winner this time"
+        },
+        {
+            # for false imp. #4
+            "in": [
+                ["Abdul", "Modena", "Zeno"],
+                [1, 35, 99],
+                1
+            ],
+            "out": "Abdul"
+        },
+    ]
 
     def test_valid(self):
-        self.assertEqual(the_lucky_winner(["Abdul", "Modena", "Zeno"], [17, 35, 99], 1001), "Lottery number can't be bigger than 1000")
+        for case in self.cases:
+            self.assertEqual(
+                the_lucky_winner(
+                    case["in"][0],
+                    case["in"][1],
+                    case["in"][2]
+                ),
+                case["out"]
+            )
 
 
 # Test your positive cases by following these steps:

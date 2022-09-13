@@ -19,9 +19,16 @@ before_script:
 #     - cd Assignments/Assignment1
 #     - python3.9 -m grader
 
-grade-assignment2:
+# grade-assignment2:
+#   stage: grade
+#   script:
+#     - pwd && ls # for debugging
+#     - cd Assignments/Assignment2
+#     - python3.9 -m grader
+
+grade-project1:
   stage: grade
   script:
     - pwd && ls # for debugging
-    - cd Assignments/Assignment2
+    - cd Projects/Project1
     - python3.9 -m grader

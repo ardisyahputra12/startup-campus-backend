@@ -23,6 +23,15 @@ and you should be done!
 
 You can now start working on your local machine by clicking  `Code > Check out branch` from the new Merge Request page.
 
+## Pre-work
+
+- Activate your virtual environment before running any Python file
+- After activation, install the necessary packages by running 
+```
+cd to root_folder
+pip3.9 install -r requirements.txt
+```
+
 ## Definition
 
 In this assignment, you will try to do the following in Python:
@@ -31,7 +40,9 @@ In this assignment, you will try to do the following in Python:
 - create a local database (via SQLite)
 - move selected data from remote database into local database
 
-You will implement the main logic into the functions provided
+Implement all functions in these two files:
+- **explore.py**
+- **migrate.py**
 
 Simply remove the `pass` statement within the function context and start coding.
 ```py
@@ -58,7 +69,7 @@ cd startup-campus-backend/Assigments/Assignment3
 
 then run
 ```
-python3.9 -m grader
+python3.9 grader.py
 ```
 you will be able to see details regarding the performance of your code and overall grade for this assignment.
 

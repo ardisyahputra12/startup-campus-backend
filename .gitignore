@@ -1,3 +1,9 @@
 startup-campus-backend/
 *.pyc
 __pycache__/
+
+# SQLite
+*.db
+
+# files
+*.csv

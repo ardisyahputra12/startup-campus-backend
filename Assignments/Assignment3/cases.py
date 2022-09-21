@@ -269,7 +269,7 @@ _most_active_n_users = [
     ["Sammy Rivers", 1067],
 ]
 most_active_users = [
-    [3, [_most_active_n_users[:3]]],
+    [3, _most_active_n_users[:3]],
     *[[n, _most_active_n_users[:n]] for n in choices(range(1, 101), k=10)],
 ]
 

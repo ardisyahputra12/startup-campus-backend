@@ -31,7 +31,6 @@ tables you need to consider:
         columns = [col.name for col in table.c] 
         print(columns)
 """
-
 from typing import List
 
 
@@ -70,8 +69,9 @@ def oldest_videos(N: int) -> List[str]:
 def most_watched_videos(N: int) -> List[str]:
     """Return the list of video titles, ordered from the most frequently watched videos.
 
-    If there are several videos with same view count, rank the most recent video (based on
-    Videos.created_at) higher in the list.
+    If there are multiple videos with same view count, rank the most recent video (based on
+    Videos.created_at) higher in the list. For instance, if both videos V1 and V2 have 100 views
+    and V1 is created earlier, than V2 should rank higher than V1 in the list.
 
     N: a positive integer
 
@@ -86,19 +86,30 @@ def most_watched_videos(N: int) -> List[str]:
 def most_active_users(N: int) -> List[List]:
     """Return top N users with the longest watching activity.
 
+    Total duration for a user is calculated as follows;
+    - When a user U watches video V, it will be registered as a view (1 row on table Views)
+    - The watching duration is NOT the length of V, but the difference between "finished_at"
+        and "started_at" for each view
+    - Accumulate the duration for all such views for user N
+    - Convert the duration into MINUTES
+
     Output a list of [username, duration] and we round the duration to the nearest integer.
 
     If there are several users with the same watching duration, order alphabetically (e.g.
     Alan is higher than Brown).
 
     Rounding happens after the sorting (e.g. Brown with 143.2 is still considered higher in
-    the list than Alan with 143.1 even though both duration will be displayed as 143)
+    the list than Alan with 143.1 even though both view time will be displayed as 143)
 
     N: a positive integer
 
     Example:
         N = 3,
-        return [["Jocelyn Newman", 1691], ["Marin Baxter", 1548], ["Howard Carson", 1539]]
+        return [
+            ["Francis Frank", 911.0],
+            ["Renee Fitzgerald", 825.0],
+            ["Rylee Giles", 815.0]
+        ]
     """
     pass
 

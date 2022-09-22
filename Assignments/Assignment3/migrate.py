@@ -23,13 +23,30 @@ tables you need to consider:
 """
 
 
+from sqlalchemy import (
+    ForeignKey,
+    String,
+    Integer,
+    Float,
+    Column,
+    Table,
+    MetaData,
+    create_engine,
+)
+
+meta = MetaData()
+
 # IMPLEMENT THIS
 def create_sqlite_db():
     """Create a SQLite database with the name of assignment3.db
 
     Make sure it is stored in the correct path: Assignment/Assignments3/assignment3.db
     """
-    pass
+    return create_engine(
+        "sqlite:///Assignment/Assignments3/assignment3.db",
+        # echo = True,
+        future = True
+    )
 
 
 # IMPLEMENT THIS
@@ -41,7 +58,15 @@ def create_table_users():
     - "followers": INT, default = 0
     - "registered_at": TEXT, can't be NULL
     """
-    pass
+    return Table(
+        "users",
+        meta,
+        Column("user_id", String, primary_key=True),
+        Column("name", String, nullable=False, unique=True),
+        Column("password", String, nullable=False),
+        Column("followers", Integer, default=0),
+        Column("registered_at", nullable=False)
+    )
 
 
 # IMPLEMENT THIS
@@ -56,7 +81,12 @@ def create_table_categories():
     - "ID": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
     """
-    pass
+    return Table(
+        "categories",
+        meta,
+        Column("ID", Integer, primary_key=True),
+        Column("Category name", String, nullable=False, unique=True)
+    )
 
 
 # IMPLEMENT THIS
@@ -74,7 +104,15 @@ def create_table_videos():
     - "category_id": INT, linked with categories.id
     - "created_at": TEXT, can't be NULL
     """
-    pass
+    return Table(
+        "videos",
+        meta,
+        Column("video_id", String, primary_key=True),
+        Column("title", String, nullable=False),
+        Column("length (min)", Float, default=0.0),
+        Column("category_id", Integer, ForeignKey('categories.ID')),
+        Column("created_at", String, nullable=False)
+    )
 
 
 # IMPLEMENT THIS
@@ -92,7 +130,15 @@ def create_table_views():
     - "started_at": TEXT, can't be NULL
     - "finished_at": TEXT
     """
-    pass
+    return Table(
+        "views",
+        meta,
+        Column("view_id", String, primary_key=True),
+        Column("user_id", String, ForeignKey("users.user_id")),
+        Column("video_id", String, ForeignKey("videos.video_id")),
+        Column("started_at", String, nullable=False),
+        Column("finished_at", String)
+    )
 
 
 # IMPLEMENT THIS

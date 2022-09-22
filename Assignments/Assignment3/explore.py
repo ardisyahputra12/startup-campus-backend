@@ -141,3 +141,5 @@ def run_query(query: str) -> List[dict]:
     with engine.connect() as conn:
         print("Connected")
         return [dict(row) for row in conn.execute(query)]
+
+# print(run_query("select * from videos"))

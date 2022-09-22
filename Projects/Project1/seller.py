@@ -1,6 +1,8 @@
 from antique import Antique
 from market import Market
 
+from basket import Basket
+
 
 class Seller:
     """
@@ -18,7 +20,13 @@ class Seller:
         """
         Each seller is specified by a unique name on a given market.
         """
-        raise NotImplementedError("Please implement Seller.__init__")
+        self.name = name
+        self.market = market
+        self.basket = Basket()
+        # raise NotImplementedError("Please implement Seller.__init__")
+
+    def __str__(self) -> str:
+        return self.market.add_seller(self.name)
 
     # IMPLEMENT THIS
     def stock(self, item: Antique, amount: int) -> str:
@@ -31,7 +39,14 @@ class Seller:
         and do not alter the basket. Otherwise, the basket is valid and you need to alter
         the basket content accordingly and return "Stocking successful"
         """
-        raise NotImplementedError("Please implement Seller.stock")
+        if (self.__str__() == f"{self.name} is already a registered seller"):
+            if(amount <= 0):
+                return "Please specify a positive amount"
+            else:
+                self.basket.is_valid(True)
+        else:
+            return "Seller is not registered"
+        # raise NotImplementedError("Please implement Seller.stock")
 
     ##########################################################################################
     # Helper Methods: you can implement any of these if you find them useful

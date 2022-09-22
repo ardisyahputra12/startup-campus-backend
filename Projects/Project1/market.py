@@ -11,16 +11,48 @@ class Market:
 
     # IMPLEMENT THIS
     def __init__(self, name: str):
-        raise NotImplementedError("Please implement Market.__init__")
+        self.name = name
+        self.buyers = []
+        self.sellers = []
+        # raise NotImplementedError("Please implement Market.__init__")
 
     ##########################################################################################
     # Helper Methods: you can implement any of these if you find them useful
     ##########################################################################################
 
+    def insert_sorted(self, seq, elt):
+        """inserts elt at the correct place in seq, to keep it in sorted order
+        :param seq: A sorted list
+        :param elt: An element comparable to the content of seq
+        Effect: mutates the param seq.
+        Does not return a result
+        """
+        idx = 0
+        if not seq or elt > seq[-1]:
+            
+            seq.append(elt)
+        else:
+            while elt > seq[idx] and idx < len(seq):
+                idx += 1
+            seq.insert(idx, elt)
+
     def add_seller(self, seller):
         """Adds a new seller to this market and verify duplicate usernames."""
-        pass
+        if seller not in self.sellers:
+            self.sellers.sort()
+            self.insert_sorted(self.sellers, seller)
+            # self.sellers.append(seller)
+            # self.sellers.sort()
+            return f"{seller} success register as seller"
+        else:
+            # seller.registered = False
+            return f"{seller} is already a registered seller"
 
     def add_buyer(self, buyer):
         """Adds a new buyer to this market and verify duplicate usernames."""
-        pass
+        if buyer.name not in self.buyers:
+            self.buyers.sort()
+            self.insert_sorted(self.buyers, buyer.name)
+        else:
+            buyer.registered = False
+            print(f"{buyer.name} is already a registered buyer")

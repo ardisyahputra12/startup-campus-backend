@@ -1,3 +1,5 @@
+import uuid
+
 class Antique:
     """
     Representation of an antique item.
@@ -11,7 +13,16 @@ class Antique:
 
     # IMPLEMENT THIS
     def __init__(self, year_created: int, size: str):
-        raise NotImplementedError("Please implement Antique.__init__")
+        self.size = size
+        self.year_created = year_created
+        self.id = str(uuid.uuid4())
+        # raise NotImplementedError("Please implement Antique.__init__")
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id
 
 
 # IMPLEMENT THIS
@@ -26,6 +37,11 @@ class Coin(Antique):
         - "small": 0
         - "medium": 25
     """
+    def selling_price(self, year_bought):
+        if self.size == "small":
+            return 0 + (year_bought - self.year_created) * 1000
+        if self.size == "medium":
+            return 25 + (year_bought - self.year_created) * 1000
 
 
 # IMPLEMENT THIS
@@ -41,3 +57,10 @@ class Stamp(Antique):
         - "medium": 50
         - "big": 250
     """
+    def selling_price(self, year_bought):
+        if self.size == "small":
+            return 10 + (year_bought - self.year_created) * 500
+        if self.size == "medium":
+            return 50 + (year_bought - self.year_created) * 500
+        if self.size == "big":
+            return 250 + (year_bought - self.year_created) * 500

@@ -31,7 +31,6 @@ tables you need to consider:
         columns = [col.name for col in table.c] 
         print(columns)
 """
-
 from typing import List
 
 
@@ -70,8 +69,9 @@ def oldest_videos(N: int) -> List[str]:
 def most_watched_videos(N: int) -> List[str]:
     """Return the list of video titles, ordered from the most frequently watched videos.
 
-    If there are several videos with same view count, rank the most recent video (based on
-    Videos.created_at) higher in the list.
+    If there are multiple videos with same view count, rank the most recent video (based on
+    Videos.created_at) higher in the list. For instance, if both videos V1 and V2 have 100 views
+    and V1 is created earlier, than V2 should rank higher than V1 in the list.
 
     N: a positive integer
 

@@ -143,11 +143,12 @@ def test_explore():
             assert_f_eq(explore.least_watched_categories, [case[0]], exp=case[-1])
 
 
+db_name = "assignment3.db"
+
+
 @grade
 def test_migrate():
     import migrate
-
-    db_name = "assignment3.db"
 
     with Scorer(3, "Create SQLite DB"):
         migrate.create_sqlite_db()
@@ -390,6 +391,10 @@ if __name__ == "__main__":
         total_score, total_weight = test_f()
         final_score += total_score
         perfect_score += total_weight
+
+    # remove sqlite DB after every test
+    if os.path.exists(db_name):
+        os.remove(db_name)
 
     perc = round(final_score / perfect_score * 100, 1)
     highlight(

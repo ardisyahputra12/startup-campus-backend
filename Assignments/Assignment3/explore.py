@@ -37,7 +37,8 @@ from typing import List
 # IMPLEMENT THIS (3 pts)
 def count_users() -> int:
     """Return # of unique users"""
-    pass
+    query = run_query("SELECT COUNT(*) FROM users")
+    return query[0]["count"]
 
 
 # IMPLEMENT THIS (5 pts)
@@ -49,7 +50,8 @@ def count_videos(length: int) -> int:
     Example:
         if length = 10, return 156
     """
-    pass
+    query = run_query(f'SELECT COUNT(*) FROM videos where "length (min)" < {length}')
+    return query[0]["count"]
 
 
 # IMPLEMENT THIS (5 pts)
@@ -62,7 +64,8 @@ def oldest_videos(N: int) -> List[str]:
         N = 1
         return ["Triangulum Ft woodside cohosh pendulous downstream opal buckthorn sundown"]
     """
-    pass
+    query = run_query(f"SELECT title FROM videos ORDER BY created_at LIMIT {N}")
+    return [query[i]["title"] for i in range(N)]
 
 
 # IMPLEMENT THIS (7 pts)
@@ -79,7 +82,15 @@ def most_watched_videos(N: int) -> List[str]:
         N = 1,
         return ['headdress haploidy platitude sultry tapa anthropocentric knelt Catherine umbra devastate']
     """
-    pass
+    query = run_query(
+        f'''SELECT title, COUNT (views.view_id) AS total_view, created_at
+        FROM videos
+        JOIN views on views.video_id = videos.video_id
+        GROUP BY title, created_at
+        ORDER BY total_view DESC, created_at DESC
+        LIMIT {N}'''
+    )
+    return [query[i]["title"] for i in range(N)]
 
 
 # IMPLEMENT THIS (12 pts)
@@ -111,7 +122,18 @@ def most_active_users(N: int) -> List[List]:
             ["Rylee Giles", 815.0]
         ]
     """
-    pass
+    query = run_query(
+        f'''SELECT result.name, round(sum(duration)) AS total_duration
+        FROM (
+            SELECT name, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
+            FROM users
+            INNER JOIN views ON users.user_id = views.user_id
+        ) result
+        GROUP BY result.name
+        ORDER BY sum(duration) DESC, name
+        LIMIT {N}'''
+    )
+    return [list(query[i].values()) for i in range(N)]
 
 
 # IMPLEMENT THIS (10 pts)
@@ -132,7 +154,19 @@ def least_watched_categories(N: int) -> str:
         N = 1
         return ["Film & Animation"]
     """
-    pass
+    query = run_query(
+        f'''SELECT result."Category name", COUNT (result."Category name") AS total
+        FROM (
+            SELECT c."Category name", v.title, v.video_id
+            FROM categories c
+            INNER JOIN videos v ON c."ID" = v.category_id
+        ) result
+        INNER JOIN views ON views.video_id = result.video_id
+        GROUP BY result."Category name"
+        ORDER BY total
+        LIMIT {N}'''
+    )
+    return [query[i]["Category name"] for i in range(N)]
 
 
 def run_query(query: str) -> List[dict]:
@@ -152,5 +186,3 @@ def run_query(query: str) -> List[dict]:
     with engine.connect() as conn:
         print("Connected")
         return [dict(row) for row in conn.execute(query)]
-
-# print(run_query("select * from videos"))

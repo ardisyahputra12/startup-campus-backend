@@ -29,7 +29,6 @@ class Market:
         """
         idx = 0
         if not seq or elt > seq[-1]:
-            
             seq.append(elt)
         else:
             while elt > seq[idx] and idx < len(seq):
@@ -38,15 +37,12 @@ class Market:
 
     def add_seller(self, seller):
         """Adds a new seller to this market and verify duplicate usernames."""
-        if seller not in self.sellers:
+        if seller.name not in self.sellers:
             self.sellers.sort()
-            self.insert_sorted(self.sellers, seller)
-            # self.sellers.append(seller)
-            # self.sellers.sort()
-            return f"{seller} success register as seller"
+            self.insert_sorted(self.sellers, seller.name)
         else:
-            # seller.registered = False
-            return f"{seller} is already a registered seller"
+            seller.registered = False
+            print(f"{seller.name} is already a registered seller")
 
     def add_buyer(self, buyer):
         """Adds a new buyer to this market and verify duplicate usernames."""

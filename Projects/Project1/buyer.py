@@ -1,6 +1,7 @@
 from antique import Antique
 from market import Market
 from seller import Seller
+from basket import Basket
 
 
 class Buyer:
@@ -21,7 +22,13 @@ class Buyer:
         In order to pay for something, buyer must have sufficient balance in the marketplace.
         Initially, the balance should be 0 but a buyer can top up any specific amount.
         """
-        raise NotImplementedError("Please implement Buyer.__init__")
+        self.name = name
+        self.market = market
+        self.basket = Basket()
+        self.balance = 0
+        self.registered = True
+        self.market.add_buyer(self)
+        # raise NotImplementedError("Please implement Buyer.__init__")
 
     # If you attempt to call any methods below with an unregistered buyer, return
     # "Buyer is not registered".
@@ -43,7 +50,14 @@ class Buyer:
 
         If all is good, alter the basket content accordingly and no need to return anything.
         """
-        raise NotImplementedError("Please implement Buyer.add_to_basket")
+        if (self.name not in self.market.buyers) or self.registered == False:
+            return "Buyer is not registered"
+        if (self.name not in self.market.buyers) or seller.registered == False:
+            return "Seller is not registered"
+        if amount < 0 :
+            return "Please specify a positive amount"
+        self.basket.add_item(item, seller, amount)
+        # raise NotImplementedError("Please implement Buyer.add_to_basket")
 
     # IMPLEMENT THIS
     def remove_from_basket(self, item: Antique, seller: Seller) -> str:
@@ -56,7 +70,12 @@ class Buyer:
 
         If all is good, alter the basket content accordingly and no need to return anything.
         """
-        raise NotImplementedError("Please implement Buyer.remove_to_basket")
+        if self.name not in self.market.buyers or self.registered == False:
+            return "Buyer is not registered"
+
+        if not self.basket.remove_item(item, seller):
+            return "No such item in the basket"
+        # raise NotImplementedError("Please implement Buyer.remove_to_basket")
 
     # IMPLEMENT THIS
     def pay(self, year_bought: int) -> str:
@@ -78,7 +97,27 @@ class Buyer:
             - clear the buyer's basket
             - return "All items are purchased!"
         """
-        raise NotImplementedError("Please implement Buyer.pay")
+        if self.name not in self.market.buyers or self.registered == False:
+            return "Buyer is not registered"
+
+        if not self.basket.is_valid():
+            return "Some items are out of stock"
+
+        if any(self.basket.entries):
+
+            total = self.basket.total_price(year_bought)
+            if self.balance < total:
+                return f"Insufficient balance, need to top up {total - self.balance}"
+
+            self.balance -= total
+            for i, j in self.basket.entries.items():
+                for item_name, stock_exist in j.items():
+                    i.sell_item(item_name, stock_exist, year_bought)
+            self.basket.clear()
+            return "All items are purchased!"
+        else:
+            return "No items to be paid"
+        # raise NotImplementedError("Please implement Buyer.pay")
 
     # IMPLEMENT THIS
     def top_up(self, amount: int):
@@ -87,4 +126,8 @@ class Buyer:
 
         When the buyer is first created, balance should be 0.
         """
-        raise NotImplementedError("Please implement Buyer.top_up")
+        if self.name not in self.market.buyers or self.registered == False:
+            return "Buyer is not registered"
+
+        self.balance += amount
+        # raise NotImplementedError("Please implement Buyer.top_up")

@@ -4,6 +4,7 @@ from functools import wraps
 from json import dumps, loads
 from typing import List, Union
 from unittest.mock import patch
+from unittest import TestCase
 
 FAILED_CASES = []
 
@@ -385,15 +386,19 @@ def test_p5():
 
     # positive testing
     print("  [Positive Testing]")
+
+    def assertEqual(a, b):
+        return TestCase().assertEqual(a, b)
+
     try:
-        with patch("unittest.TestCase.assertEqual") as mock:
+        with patch("p5.LuckyWinnerTest.assertEqual", side_effect=assertEqual) as mock:
             LuckyWinnerTest().test_valid()
         mock.assert_called()
         total_scores += 3
         print("    Passed all assertions for the correct implementation (3 pts)")
     except Exception as e:
         print(f"    Some of your test cases fail to test the correct implementation\n")
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
 
     # negative testing (max: 12 PTS)
     if total_scores > 0:
@@ -425,7 +430,7 @@ def test_p5():
 
 # @grade("Problem 6")
 # def test_p6():
-#     return 0, 25
+#     return 0, 20
 
 
 ##############################################################################################

@@ -306,7 +306,7 @@ def test_p3():
     if os.path.isfile(db_name):
         os.remove(db_name)
 
-    with safe_init(20):
+    with safe_init(30):
         from p3 import app
 
         app.config.update({"TESTING": True})
@@ -461,7 +461,11 @@ def test_p3():
 
 @grade
 def test_p4():
-    import p4
+    with safe_init(40):
+        from p4 import app
+
+        app.config.update({"TESTING": True})
+        c = app.test_client()
 
 
 ##############################################################################################
@@ -475,12 +479,7 @@ def highlight(s: str):
 
 if __name__ == "__main__":
     highlight("Grading Assignment 4...")
-    tests = [
-        test_p1,
-        test_p2,
-        test_p3,
-        # test_p4
-    ]
+    tests = [test_p1, test_p2, test_p3, test_p4]
 
     final_score = 0
     perfect_score = 0

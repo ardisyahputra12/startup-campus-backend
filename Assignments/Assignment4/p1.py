@@ -37,7 +37,7 @@ Hint:
         # you can access value of k1 as usual -> args["k1"] 
 """
 
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -45,7 +45,21 @@ app = Flask(__name__)
 @app.route("/area", methods=["GET"])
 def get_area():
     # IMPLEMENT THIS
-    pass
+    length = request.args.get("length", type=int)
+    width = request.args.get("width", type=int)
+
+    if length < 1 or width < 1:
+        return {
+            "error": "Both length and with must be positive numbers"
+        }, 400
+    elif length < width:
+        return {
+            "error": "Length should not be shorter than width"
+        }, 400
+    else:
+        return {
+            "area": length * width
+        }, 200
 
 
 # TEST IT YOURSELF

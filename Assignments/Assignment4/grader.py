@@ -196,7 +196,107 @@ def test_p1():
 
 @grade
 def test_p2():
-    import p2
+    with safe_init(20):
+        from p2 import app
+
+        app.config.update({"TESTING": True})
+        c = app.test_client()
+
+    with Scorer(2, "Initial candies"):
+        assert_response(
+            c, "get", "/candies", exp_json={"message": "I have 0 candies"}, exp_code=200
+        )
+
+    with Scorer(2, "Initial chocolates"):
+        assert_response(
+            c,
+            "get",
+            "/chocolates",
+            exp_json={"message": "I have 0 chocolates"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Add candy"):
+        assert_response(
+            c,
+            "post",
+            "/gifts",
+            json={"candy": 1},
+            exp_json={"message": "Gifts are well received!"},
+            exp_code=201,
+        )
+
+    with Scorer(2, "Add chocolate"):
+        assert_response(
+            c,
+            "post",
+            "/gifts",
+            json={"chocolate": 1},
+            exp_json={"message": "Gifts are well received!"},
+            exp_code=201,
+        )
+
+    with Scorer(2, "No candy/chocolates are given"):
+        assert_response(
+            c,
+            "post",
+            "/gifts",
+            json={},
+            exp_json={"error": "No gifts for today :("},
+            exp_code=400,
+        )
+
+    with Scorer(3, "Check candy/chocolate"):
+        assert_response(
+            c, "get", "/candies", exp_json={"message": "I have 1 candy"}, exp_code=200
+        )
+        assert_response(
+            c,
+            "get",
+            "/chocolates",
+            exp_json={"message": "I have 1 chocolate"},
+            exp_code=200,
+        )
+
+    with Scorer(3, "Add more candies and chocolates"):
+        assert_response(
+            c,
+            "post",
+            "/gifts",
+            json={"candy": 2, "chocolate": 3},
+            exp_json={"message": "Gifts are well received!"},
+            exp_code=201,
+        )
+        assert_response(
+            c,
+            "post",
+            "/gifts",
+            json={"candy": 5},
+            exp_json={"message": "Gifts are well received!"},
+            exp_code=201,
+        )
+        assert_response(
+            c,
+            "post",
+            "/gifts",
+            json={"chocolate": 2},
+            exp_json={"message": "Gifts are well received!"},
+            exp_code=201,
+        )
+
+    with Scorer(2, "Check final candies"):
+        assert_response(
+            c, "get", "/candies", exp_json={"message": "I have 8 candies"}, exp_code=200
+        )
+
+    with Scorer(2, "Check final chocolates"):
+        assert_response(
+            c,
+            "get",
+            "/chocolates",
+            exp_json={"message": "I have 6 chocolates"},
+            exp_code=200,
+        )
 
 
 @grade
@@ -219,7 +319,7 @@ def test_p3():
             "/register",
             json={"username": "Adam", "password": "Eve12345"},
             exp_json={"message": "Registration successful"},
-            exp_code=200,
+            exp_code=201,
         )
 
     with Scorer(2, "Missing username/password"):
@@ -283,7 +383,7 @@ def test_p3():
             "/register",
             json={"username": "Bruno", "password": "n0t_e4sy"},
             exp_json={"message": "Registration successful"},
-            exp_code=200,
+            exp_code=201,
         )
 
     with Scorer(4, "Successful login"):
@@ -375,7 +475,12 @@ def highlight(s: str):
 
 if __name__ == "__main__":
     highlight("Grading Assignment 4...")
-    tests = [test_p1, test_p2, test_p3, test_p4]
+    tests = [
+        test_p1,
+        test_p2,
+        test_p3,
+        # test_p4
+    ]
 
     final_score = 0
     perfect_score = 0

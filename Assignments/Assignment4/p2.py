@@ -44,7 +44,7 @@ In this problem, you will implement endpoints that simulate those behaviors.
     - chocolate: int (optional)
 
 [[Logic]]
-0. If both "candy" and "password" are not given in the request body:
+0. If both "candy" and "chocolate" are not given in the request body:
     - return {"error": "No gifts for today :("}
     - status code; 400
 1. gift is valid if it satisfies all of these:

@@ -58,7 +58,7 @@ In this problem, you will implement endpoints that simulate those behaviors.
     - return {"error": "We need real candies and chocolates"}
     - status code: 400
 """
-from flask import Flask
+from flask import Flask, request
 
 
 def create_app():
@@ -75,7 +75,37 @@ def create_app():
 app = create_app()
 
 # IMPLEMENT ALL ENDPOINTS below
+@app.route("/candies", methods=["GET"])
+def candies():
+    return {
+        "message": f"I have {None} candies"
+    }, 200
 
+@app.route("/chocolates", methods=["GET"])
+def chocolates():
+    return {
+        "message": f"I have {None} chocolates"
+    }, 200
+
+@app.route("/gifts", methods=["POST"])
+def gifts():
+    candy = request.form.get("candy", type=int)
+    chocolate = request.form.get("chocolate", type=int)
+
+    if candy == None and chocolate == None:
+        return {
+            "error": "No gifts for today :("
+        }, 400
+    elif candy < 1 or chocolate < 1:
+        return {
+            "error": "We need real candies and chocolates"
+        }, 400
+    else:
+        # update data
+        # ---------
+        return {
+            "message": "Gifts are well received!"
+        }, 201
 
 # TEST IT YOURSELF
 #   cd to Assignment4 folder

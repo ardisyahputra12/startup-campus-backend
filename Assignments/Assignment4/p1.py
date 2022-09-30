@@ -13,7 +13,7 @@ the length and the width of the rectangle, and then return the area from the res
 
 [Logic]
 1. If either length OR width is not positive, 
-    - return {"error": "Both length and with must be positive numbers"}
+    - return {"error": "Both length and width must be positive numbers"}
     - status code: 400
 2. If length is shorter than width
     - return {"error": "Length should not be shorter than width"}

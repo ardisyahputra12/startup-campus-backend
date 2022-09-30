@@ -42,15 +42,15 @@ login.
 - Method: POST
 - URL: /login
 - Request body
-    - username: string
-    - password: string
+    - username: string (required)
+    - password: string (required)
 
 [[Logic]]
 0. If username or password is not given in the request body
     - return {"error": "Username or password is not given"}
     - status code; 400
 1. login will be valid if it satisfies all these:
-    - username hasn't been registered
+    - username has been registered
     - password is correct
    on valid login:
     - return {"message": "Login successful"}

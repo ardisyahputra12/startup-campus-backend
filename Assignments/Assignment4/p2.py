@@ -58,7 +58,8 @@ In this problem, you will implement endpoints that simulate those behaviors.
     - return {"error": "We need real candies and chocolates"}
     - status code: 400
 """
-from flask import Flask, request
+
+from flask import Flask, request, current_app
 
 
 def create_app():
@@ -69,43 +70,56 @@ def create_app():
     # HINT: you can use:
     #   - Database (e.g. SQLite)
     #   - Use app.config[<key>] to store value and current_app.config[<key>] to retrieve
+    app.config["candy"] = 0
+    app.config["chocolate"] = 0
     return app
 
 
 app = create_app()
 
+
+def success_message(val: int, obj: str):
+    return {
+        "message": f"I have {val} {obj}"
+    }, 200
+
+def error_message(msg: str):
+    return {
+        "error": msg
+    }, 400
+
+def create_message(msg: str):
+    return {
+        "message": msg
+    }, 201
+
 # IMPLEMENT ALL ENDPOINTS below
 @app.route("/candies", methods=["GET"])
 def candies():
-    return {
-        "message": f"I have {None} candies"
-    }, 200
+    candy = current_app.config["candy"]
+    if candy == 1: return success_message(candy, "candy")
+    else: return success_message(candy, "candies")
 
 @app.route("/chocolates", methods=["GET"])
 def chocolates():
-    return {
-        "message": f"I have {None} chocolates"
-    }, 200
+    chocolate = current_app.config["chocolate"]
+    if chocolate == 1: return success_message(chocolate, "chocolate")
+    else: return success_message(chocolate, "chocolates")
 
 @app.route("/gifts", methods=["POST"])
 def gifts():
-    candy = request.form.get("candy", type=int)
-    chocolate = request.form.get("chocolate", type=int)
-
-    if candy == None and chocolate == None:
-        return {
-            "error": "No gifts for today :("
-        }, 400
-    elif candy < 1 or chocolate < 1:
-        return {
-            "error": "We need real candies and chocolates"
-        }, 400
+    data = request.get_json()
+    if data == {}: return error_message("No gifts for today :(")
+    elif (
+            "candy" in data and data["candy"] < 1
+        ) or (
+                "chocolate" in data and data["chocolate"] < 1
+            ):
+        return error_message("We need real candies and chocolates")
     else:
-        # update data
-        # ---------
-        return {
-            "message": "Gifts are well received!"
-        }, 201
+        if "candy" in data: current_app.config["candy"] += data["candy"]
+        if "chocolate" in data: current_app.config["chocolate"] += data["chocolate"]
+        return create_message("Gifts are well received!")
 
 # TEST IT YOURSELF
 #   cd to Assignment4 folder

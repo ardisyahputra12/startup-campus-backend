@@ -45,8 +45,9 @@ app = Flask(__name__)
 @app.route("/area", methods=["GET"])
 def get_area():
     # IMPLEMENT THIS
-    length = request.args.get("length", type=int)
-    width = request.args.get("width", type=int)
+    body = request.args
+    length = body.get("length", type=int)
+    width = body.get("width", type=int)
 
     if length < 1 or width < 1:
         return {

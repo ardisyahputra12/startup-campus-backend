@@ -64,7 +64,7 @@ login.
 """
 import os
 
-from flask import Flask
+from flask import Flask, request
 from sqlalchemy import Column, MetaData, String, Table, create_engine, text
 
 
@@ -93,16 +93,54 @@ def create_app():
 app = create_app()
 
 
+def error_message(msg: str, sts: int):
+    return {
+        "error": msg
+    }, sts
+
+def success_message(msg: str, sts: int):
+    return {
+        "message": msg
+    }, sts
+
 @app.route("/register", methods=["POST"])
 def register():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    # Request body:
+    #     - username: string (required)
+    #     - password: string (required)
 
+    if ("username" not in data) or ("password" not in data):
+        return error_message("Username or password is not given", 400)
+    elif [{"username": data["username"]}] == run_query(f"SELECT username FROM users WHERE username = '{data['username']}'"):
+        return error_message("This username has been registered", 409)
+    else:
+        if len(data["password"]) < 8:
+            return error_message("Password must contain at least 8 characters", 400)
+        if any(val.isalpha() for val in data["password"]) == False:
+            return error_message("Password must contain a letter", 400)
+        if any(val.isnumeric() for val in data["password"]) == False:
+            return error_message("Password must contain a number", 400)
+        run_query(f"INSERT INTO users VALUES {data['username'], data['password']}", commit=True)
+        return success_message("Registration successful", 201)
 
 @app.route("/login", methods=["POST"])
 def login():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    # Request body:
+    #     - username: string (required)
+    #     - password: string (required)
+
+    if ("username" not in data) or ("password" not in data):
+        return error_message("Username or password is not given", 400)
+    elif [{"username": data["username"]}] != run_query(f"SELECT username FROM users WHERE username = '{data['username']}'"):
+        return error_message("Username is not registered", 401)
+    elif [{"password": data["password"]}] != run_query(f"SELECT password FROM users WHERE password = '{data['password']}'"):
+        return error_message("Wrong password", 401)
+    else:
+        return success_message("Login successful", 200)
 
 
 ##############################################################################################

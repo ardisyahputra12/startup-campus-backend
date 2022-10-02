@@ -109,6 +109,10 @@ def chocolates():
 @app.route("/gifts", methods=["POST"])
 def gifts():
     data = request.get_json()
+    # Request body:
+    #     - candy: int (optional)
+    #     - chocolate: int (optional)
+
     if data == {}: return error_message("No gifts for today :(")
     elif (
             "candy" in data and data["candy"] < 1

@@ -467,6 +467,222 @@ def test_p4():
         app.config.update({"TESTING": True})
         c = app.test_client()
 
+    with Scorer(2, "Adding initial books"):
+        for title in ("Ulysses", "Pride and Prejudice", "Freakonomics", "Steve Jobs"):
+            assert_response(
+                c,
+                "post",
+                "/book",
+                json={"title": title},
+                exp_json={"message": f"Book {title} is added"},
+                exp_code=201,
+            )
+
+    with Scorer(3, "Can't add duplicate books"):
+        for title in ("Ulysses", "Freakonomics"):
+            assert_response(
+                c,
+                "post",
+                "/book",
+                json={"title": title},
+                exp_json={"error": "Book with the same title already exists"},
+                exp_code=400,
+            )
+
+    with Scorer(3, "Can't remove a non-existent book"):
+        for title in ("Moby Dick", "The Exponential Age"):
+            assert_response(
+                c,
+                "delete",
+                "/book",
+                json={"title": title},
+                exp_json={"error": "Book is not known"},
+                exp_code=400,
+            )
+
+    with Scorer(2, "Borrowing a book"):
+        for title in ("Ulysses", "Pride and Prejudice"):
+            assert_response(
+                c,
+                "post",
+                "/borrow",
+                json={"name": "Jane", "title": title},
+                exp_json={"message": f"Book {title} is borrowed by Jane"},
+                exp_code=200,
+            )
+        assert_response(
+            c,
+            "post",
+            "/borrow",
+            json={"name": "Stephen", "title": "Freakonomics"},
+            exp_json={"message": "Book Freakonomics is borrowed by Stephen"},
+            exp_code=200,
+        )
+
+    with Scorer(3, "Can't remove a borrowed book"):
+        assert_response(
+            c,
+            "delete",
+            "/book",
+            json={"title": "Freakonomics"},
+            exp_json={"error": "Book is currently borrowed by Stephen"},
+            exp_code=403,
+        )
+        assert_response(
+            c,
+            "delete",
+            "/book",
+            json={"title": "Pride and Prejudice"},
+            exp_json={"error": "Book is currently borrowed by Jane"},
+            exp_code=403,
+        )
+
+    with Scorer(3, "Can't borrow a book currently borrowed by others"):
+        assert_response(
+            c,
+            "post",
+            "/borrow",
+            json={"name": "Stephen", "title": "Pride and Prejudice"},
+            exp_json={"error": "Book is currently borrowed"},
+            exp_code=403,
+        )
+        assert_response(
+            c,
+            "post",
+            "/borrow",
+            json={"name": "Jane", "title": "Freakonomics"},
+            exp_json={"error": "Book is currently borrowed"},
+            exp_code=403,
+        )
+
+    with Scorer(3, "Can't borrow a book currently borrowed themselves"):
+        assert_response(
+            c,
+            "post",
+            "/borrow",
+            json={"name": "Jane", "title": "Pride and Prejudice"},
+            exp_json={"error": "You are currently borrowing this book"},
+            exp_code=400,
+        )
+        assert_response(
+            c,
+            "post",
+            "/borrow",
+            json={"name": "Stephen", "title": "Freakonomics"},
+            exp_json={"error": "You are currently borrowing this book"},
+            exp_code=400,
+        )
+
+    with Scorer(3, "Can't borrow non-existent book"):
+        for title in ("Moby Dick", "The Exponential Age"):
+            for name in ("Jane", "Stephen"):
+                assert_response(
+                    c,
+                    "post",
+                    "/borrow",
+                    json={"name": name, "title": title},
+                    exp_json={"error": "Book is not known"},
+                    exp_code=400,
+                )
+
+    with Scorer(3, "Can't add book with the same title with a borrowed book"):
+        for title in ("Ulysses", "Freakonomics", "Pride and Prejudice"):
+            assert_response(
+                c,
+                "post",
+                "/book",
+                json={"title": title},
+                exp_json={"error": "Book with the same title already exists"},
+                exp_code=400,
+            )
+
+    with Scorer(2, "Returning a book"):
+        for title in ("Ulysses", "Pride and Prejudice"):
+            assert_response(
+                c,
+                "post",
+                "/return",
+                json={"name": "Jane", "title": title},
+                exp_json={"message": f"Book {title} is returned safely"},
+                exp_code=200,
+            )
+
+    with Scorer(3, "Returned book can now be borrowed"):
+        for title in ("Ulysses", "Pride and Prejudice"):
+            assert_response(
+                c,
+                "post",
+                "/borrow",
+                json={"name": "Stephen", "title": title},
+                exp_json={"message": f"Book {title} is borrowed by Stephen"},
+                exp_code=200,
+            )
+
+    with Scorer(3, "Returned book can now be removed"):
+        assert_response(
+            c,
+            "post",
+            "/return",
+            json={"name": "Stephen", "title": "Freakonomics"},
+            exp_json={"message": "Book Freakonomics is returned safely"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "delete",
+            "/book",
+            json={"title": "Freakonomics"},
+            exp_json={"message": "Book Freakonomics is removed"},
+            exp_code=200,
+        )
+
+    with Scorer(3, "Can't remove a book that is already removed"):
+        assert_response(
+            c,
+            "delete",
+            "/book",
+            json={"title": "Steve Jobs"},
+            exp_json={"message": "Book Steve Jobs is removed"},
+            exp_code=200,
+        )
+        for title in ("Steve Jobs", "Freakonomics"):
+            assert_response(
+                c,
+                "delete",
+                "/book",
+                json={"title": title},
+                exp_json={"error": "Book is not known"},
+                exp_code=400,
+            )
+
+    with Scorer(2, "Can re-borrow a book"):
+        assert_response(
+            c,
+            "post",
+            "/return",
+            json={"name": "Stephen", "title": "Pride and Prejudice"},
+            exp_json={"message": "Book Pride and Prejudice is returned safely"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "post",
+            "/borrow",
+            json={"name": "Jane", "title": "Pride and Prejudice"},
+            exp_json={"message": "Book Pride and Prejudice is borrowed by Jane"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Can re-add a removed book"):
+        assert_response(
+            c,
+            "post",
+            "/book",
+            json={"title": "Steve Jobs"},
+            exp_json={"message": "Book Steve Jobs is added"},
+            exp_code=201,
+        )
+
 
 ##############################################################################################
 

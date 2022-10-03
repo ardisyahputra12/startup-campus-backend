@@ -182,14 +182,14 @@ def test_p1():
             c,
             "get",
             "/area?length=-1&width=5",
-            exp_json={"error": "Both length and with must be positive numbers"},
+            exp_json={"error": "Both length and width must be positive numbers"},
             exp_code=400,
         )
         assert_response(
             c,
             "get",
             "/area?length=8&width=0",
-            exp_json={"error": "Both length and with must be positive numbers"},
+            exp_json={"error": "Both length and width must be positive numbers"},
             exp_code=400,
         )
 

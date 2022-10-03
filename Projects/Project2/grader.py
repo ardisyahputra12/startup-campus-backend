@@ -212,7 +212,7 @@ def test_end_to_end():
                 exp_code=201,
             )
 
-    with Scorer(8, "Check for invalid password"):
+    with Scorer(6, "Check for invalid password"):
         invalid_passwords = [
             ("aB12cD3", "Password must contain at least 8 characters"),
             ("0123456", "Password must contain at least 8 characters"),
@@ -236,7 +236,7 @@ def test_end_to_end():
                 exp_code=400,
             )
 
-    with Scorer(8, "Can't register duplicate users"):
+    with Scorer(4, "Can't register duplicate users"):
         for name, password in [*buyers, *sellers]:
             for type in ("seller", "buyer"):
                 assert_response(
@@ -248,7 +248,7 @@ def test_end_to_end():
                     exp_code=409,
                 )
 
-    with Scorer(3, "Successful login"):
+    with Scorer(2, "Successful login"):
         seller_tokens = []
         for name, password in sellers:
             response = assert_response(
@@ -263,7 +263,7 @@ def test_end_to_end():
 
         buyer_tokens = []
         for name, password in buyers:
-            assert_response(
+            response = assert_response(
                 c,
                 "post",
                 "/login",
@@ -284,7 +284,7 @@ def test_end_to_end():
                 exp_code=401,
             )
 
-    with Scorer(4, "Incorrect password when logging in"):
+    with Scorer(3, "Incorrect password when logging in"):
         valid_password = "aB123456"
         assert_response(
             c,
@@ -319,12 +319,12 @@ def test_end_to_end():
             exp_code=401,
         )
 
-    with Scorer(2, "Stocking new items"):
+    with Scorer(2, "Stocking new items successfully"):
         seller1_initial_items = [
             ("A1", 5, 10),
             ("A2", 5, 20),
             ("A3", 2, 150),
-            ("B1", 10, 25),
+            ("B1", 5, 25),
             ("B2", 3, 50),
             ("B3", 1, 150),
         ]
@@ -358,7 +358,7 @@ def test_end_to_end():
                 exp_code=201,
             )
 
-    with Scorer(2, "Amount of item to stock must be positive"):
+    with Scorer(2, "Amount and price of item to stock must be positive"):
         for X in (-10, -5, 0):
             assert_response(
                 c,
@@ -369,9 +369,6 @@ def test_end_to_end():
                 exp_json={"error": "Please specify a positive amount"},
                 exp_code=400,
             )
-
-    with Scorer(2, "Price of item to stock must be positive"):
-        for X in (-10, -5, 0):
             assert_response(
                 c,
                 "post",
@@ -382,7 +379,7 @@ def test_end_to_end():
                 exp_code=400,
             )
 
-    with Scorer(3, "Non-existent seller can't stock new item"):
+    with Scorer(2, "Non-existent seller can't stock new item"):
         assert_response(
             c,
             "post",
@@ -393,7 +390,7 @@ def test_end_to_end():
             exp_code=403,
         )
 
-    with Scorer(4, "Can't stock the same item (only update amount)"):
+    with Scorer(3, "Seller can't stock the same item (only update amount)"):
         assert_response(
             c,
             "post",
@@ -404,7 +401,7 @@ def test_end_to_end():
             exp_code=400,
         )
 
-    with Scorer(4, "Update amount/price of an item"):
+    with Scorer(3, "Seller can update amount/price of an item"):
         assert_response(
             c,
             "put",
@@ -424,6 +421,40 @@ def test_end_to_end():
             exp_code=200,
         )
 
+    with Scorer(2, "Checking initial revenue"):
+        for index, seller in enumerate(sellers):
+            token = seller_tokens[index]
+            assert_response(
+                c,
+                "get",
+                "/seller/revenue",
+                headers={"token": token},
+                exp_json={"message": "Your revenue is 0"},
+                exp_code=200,
+            )
+
+    with Scorer(2, "Non-existent seller can't check revenue"):
+        for token in [*buyer_tokens, "123456"]:
+            assert_response(
+                c,
+                "get",
+                "/seller/revenue",
+                headers={"token": token},
+                exp_json={"error": "Unauthorized seller"},
+                exp_code=403,
+            )
+
+    with Scorer(2, "Amount and price are not specified"):
+        assert_response(
+            c,
+            "put",
+            "/seller/stock",
+            json={"item": "A4"},
+            headers={"token": seller_tokens[1]},
+            exp_json={"error": "Please specify amount or price"},
+            exp_code=400,
+        )
+
     with Scorer(2, "Amount of item to update must be non-negative"):
         for X in (-10, -5):
             assert_response(
@@ -432,7 +463,7 @@ def test_end_to_end():
                 "/seller/stock",
                 json={"item": "A1", "amount": X, "price": 123},
                 headers={"token": seller_tokens[0]},
-                exp_json={"error": "Please specify a positive amount or 0"},
+                exp_json={"error": "Please specify a positive amount OR 0"},
                 exp_code=400,
             )
 
@@ -448,7 +479,7 @@ def test_end_to_end():
                 exp_code=400,
             )
 
-    with Scorer(3, "Non-existent seller can't update price"):
+    with Scorer(2, "Non-existent seller can't update price"):
         assert_response(
             c,
             "put",
@@ -469,6 +500,388 @@ def test_end_to_end():
             exp_json={"error": "Item is not known"},
             exp_code=400,
         )
+
+    with Scorer(4, "Buyer can view the price of items"):
+        items = [
+            ("A1", sellers[0][0], 10),
+            ("A3", sellers[0][0], 150),
+            ("B2", sellers[0][0], 50),
+            ("B3", sellers[0][0], 150),
+            ("A1", sellers[1][0], 12),
+            ("A2", sellers[1][0], 25),
+            ("B1", sellers[1][0], 20),
+            ("B3", sellers[1][0], 250),
+        ]
+        for item in items:
+            random_buyer_token = choice(buyer_tokens)
+            assert_response(
+                c,
+                "get",
+                f"/buyer/item?item={item[0]}&seller={item[1]}",
+                headers={"token": random_buyer_token},
+                exp_json={"message": f"Price is {item[2]}"},
+                exp_code=200,
+            )
+
+    with Scorer(3, "Buyer can view updated prices"):
+        assert_response(
+            c,
+            "put",
+            "/seller/stock",
+            json={"item": "B1", "amount": 10},
+            headers={"token": seller_tokens[0]},
+            exp_json={"message": "Item information is updated"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "get",
+            f"/buyer/item?item=A1&seller={sellers[0][0]}",
+            headers={"token": buyer_tokens[0]},
+            exp_json={"message": f"Price is 10"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "put",
+            "/seller/stock",
+            json={"item": "A1", "amount": 10, "price": 12},
+            headers={"token": seller_tokens[1]},
+            exp_json={"message": "Item information is updated"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "get",
+            f"/buyer/item?item=A1&seller={sellers[1][0]}",
+            headers={"token": buyer_tokens[1]},
+            exp_json={"message": f"Price is 12"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Non-existent buyer can't view items"):
+        for token in [*seller_tokens, "12345678"]:
+            assert_response(
+                c,
+                "get",
+                f"/buyer/item?item=A1&seller={sellers[0][0]}",
+                headers={"token": token},
+                exp_json={"error": "Unauthorized buyer"},
+                exp_code=403,
+            )
+            assert_response(
+                c,
+                "get",
+                f"/buyer/item?item=B2&seller={sellers[1]}",
+                headers={"token": token},
+                exp_json={"error": "Unauthorized buyer"},
+                exp_code=403,
+            )
+
+    with Scorer(2, "Can't view non-existent items"):
+        for seller in sellers:
+            assert_response(
+                c,
+                "get",
+                f"/buyer/item?item=A4&seller={seller[0]}",
+                headers={"token": buyer_tokens[0]},
+                exp_json={"error": "Item is not known"},
+                exp_code=400,
+            )
+
+    with Scorer(2, "Succesfully adding items to the basket"):
+        basket1_items = (
+            ("A1", sellers[0][0], 4),
+            ("A2", sellers[0][0], 3),
+            ("A1", sellers[0][0], 3),
+            ("B2", sellers[0][0], 3),
+        )
+        for item, seller, amount in basket1_items:
+            assert_response(
+                c,
+                "post",
+                "/buyer/item",
+                headers={"token": buyer_tokens[0]},
+                json={"item": item, "seller": seller, "amount": amount},
+                exp_json={"message": "Item is added to the basket"},
+                exp_code=201,
+            )
+
+        basket2_items = (
+            ("A1", sellers[1][0], 5),
+            ("A2", sellers[1][0], 2),
+            ("B2", sellers[1][0], 1),
+            ("A2", sellers[1][0], 1),
+        )
+        for item, seller, amount in basket2_items:
+            assert_response(
+                c,
+                "post",
+                "/buyer/item",
+                headers={"token": buyer_tokens[1]},
+                json={"item": item, "seller": seller, "amount": amount},
+                exp_json={"message": "Item is added to the basket"},
+                exp_code=201,
+            )
+
+        basket3_items = (("A1", sellers[0][0], 5), ("B3", sellers[1][0], 1))
+        for item, seller, amount in basket3_items:
+            assert_response(
+                c,
+                "post",
+                "/buyer/item",
+                headers={"token": buyer_tokens[2]},
+                json={"item": item, "seller": seller, "amount": amount},
+                exp_json={"message": "Item is added to the basket"},
+                exp_code=201,
+            )
+
+    with Scorer(2, "Amount of items to add to the basket must be positive"):
+        for num in [-10, -5, -2, 0]:
+            random_item = choice(["A1", "A2", "A3", "B1", "B2", "B3"])
+            random_buyer_token = choice(buyer_tokens)
+            random_seller = choice(sellers)
+            assert_response(
+                c,
+                "post",
+                "/buyer/item",
+                headers={"token": random_buyer_token},
+                json={"item": random_item, "seller": random_seller[0], "amount": num},
+                exp_json={"error": "Please specify a positive amount"},
+                exp_code=400,
+            )
+
+    with Scorer(2, "Non-existent buyer can't add items to the basket"):
+        for token in [*seller_tokens, "12345678"]:
+            assert_response(
+                c,
+                "post",
+                "/buyer/item",
+                headers={"token": token},
+                json={"item": "A1", "name": sellers[0], "amount": 5},
+                exp_json={"error": "Unauthorized buyer"},
+                exp_code=403,
+            )
+
+    with Scorer(4, "Can't pay if some item is unavailable due to insufficient stock"):
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[0]},
+            exp_json={"error": "Insufficient stock"},
+            exp_code=400,
+        )
+
+    with Scorer(2, "Buyer can remove specific item from a basket"):
+        assert_response(
+            c,
+            "delete",
+            "/buyer/item",
+            headers={"token": buyer_tokens[0]},
+            json={"item": "A1", "seller": sellers[0][0]},
+            exp_json={"message": "Item is removed from the basket"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Non-existent buyers can't remove items from basket"):
+        for token in [*seller_tokens, "12345678"]:
+            assert_response(
+                c,
+                "delete",
+                "/buyer/item",
+                json={"item": "A1", "seller": sellers[0][0]},
+                headers={"token": token},
+                exp_json={"error": "Unauthorized buyer"},
+                exp_code=403,
+            )
+
+    with Scorer(4, "Can't pay if balance is insufficient"):
+        assert_response(
+            c,
+            "post",
+            "/buyer/item",
+            headers={"token": buyer_tokens[0]},
+            json={"item": "A1", "seller": sellers[0][0], "amount": 5},
+            exp_json={"message": "Item is added to the basket"},
+            exp_code=201,
+        )
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[0]},
+            exp_json={"error": "Please top up 260"},
+            exp_code=400,
+        )
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[1]},
+            exp_json={"error": "Please top up 235"},
+            exp_code=400,
+        )
+
+    with Scorer(2, "Successful top up"):
+        assert_response(
+            c,
+            "post",
+            "/buyer/topup",
+            headers={"token": buyer_tokens[0]},
+            json={"amount": 260},
+            exp_json={"message": "Your balance is updated"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "post",
+            "/buyer/topup",
+            headers={"token": buyer_tokens[1]},
+            json={"amount": 300},
+            exp_json={"message": "Your balance is updated"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "post",
+            "/buyer/topup",
+            headers={"token": buyer_tokens[2]},
+            json={"amount": 300},
+            exp_json={"message": "Your balance is updated"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Non-existent buyer can't top up"):
+        for token in [*seller_tokens, "12345678"]:
+            assert_response(
+                c,
+                "post",
+                "/buyer/topup",
+                headers={"token": token},
+                json={"amount": 100},
+                exp_json={"error": "Unauthorized buyer"},
+                exp_code=403,
+            )
+
+    with Scorer(2, "Non-existent buyer can't make any payment"):
+        for token in [*seller_tokens, "12345678"]:
+            assert_response(
+                c,
+                "post",
+                "/buyer/pay",
+                headers={"token": token},
+                exp_json={"error": "Unauthorized buyer"},
+                exp_code=403,
+            )
+
+    with Scorer(2, "Succesful payment (ready stock + sufficient balance)"):
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[0]},
+            exp_json={"message": "Payment is successsful"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[1]},
+            exp_json={"message": "Payment is successsful"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Succesful payment after stock is replenished"):
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[2]},
+            exp_json={"error": "Insufficient stock"},
+            exp_code=400,
+        )
+        assert_response(
+            c,
+            "put",
+            "/seller/stock",
+            json={"item": "A1", "amount": 5},
+            headers={"token": seller_tokens[0]},
+            exp_json={"message": "Item information is updated"},
+            exp_code=200,
+        )
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[2]},
+            exp_json={"message": "Payment is successsful"},
+            exp_code=200,
+        )
+
+    with Scorer(4, "Check revenue after purchases"):
+        revenues = [310, 485]
+        for index, revenue in enumerate(revenues):
+            token = seller_tokens[index]
+            assert_response(
+                c,
+                "get",
+                "/seller/revenue",
+                headers={"token": token},
+                exp_json={"message": f"Your revenue is {revenue}"},
+                exp_code=200,
+            )
+
+    with Scorer(
+        2, "Check that basket is cleared after purchase and can't pay for empty basket"
+    ):
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[2]},
+            exp_json={"error": "Basket is empty"},
+            exp_code=400,
+        )
+
+    with Scorer(3, "Check buyer can re-purchase"):
+        basket2_items = (
+            ("A2", sellers[0][0], 2),
+            ("A1", sellers[1][0], 2),
+        )
+        for item, seller, amount in basket2_items:
+            assert_response(
+                c,
+                "post",
+                "/buyer/item",
+                headers={"token": buyer_tokens[1]},
+                json={"item": item, "seller": seller, "amount": amount},
+                exp_json={"message": "Item is added to the basket"},
+                exp_code=201,
+            )
+
+        assert_response(
+            c,
+            "post",
+            "/buyer/pay",
+            headers={"token": buyer_tokens[1]},
+            exp_json={"message": "Payment is successsful"},
+            exp_code=200,
+        )
+
+    with Scorer(2, "Check final revenue"):
+        revenues = [350, 509]
+        for index, revenue in enumerate(revenues):
+            token = seller_tokens[index]
+            assert_response(
+                c,
+                "get",
+                "/seller/revenue",
+                headers={"token": token},
+                exp_json={"message": f"Your revenue is {revenue}"},
+                exp_code=200,
+            )
 
 
 ##############################################################################################

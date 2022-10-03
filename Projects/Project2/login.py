@@ -19,7 +19,7 @@ Requirements (from the earliest to check):
 - If everything is valid:
     - return {"message": "Welcome to the marketplace", "token": <token>}
     - status code: 200
-    - NOTES: 
+    - NOTE: 
         - token must be a UNIQUE string to identify a specific user
         - the next time the same user logins, a new, unique token will be generated
         - TIPS: you can consider using standard Python library uuid to generate a random

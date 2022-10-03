@@ -8,6 +8,7 @@ Please check the following files for more detailed explanations (in this order):
     - Registration: register.py
     - Login: login.py
     - Seller: seller.py
+    - Buyer: buyer.py
 
 TO DO:
     - Implement setup logic below (on create_app function)
@@ -24,6 +25,7 @@ DO NOT:
 """
 from flask import Flask
 
+from buyer import buyer_bp
 from login import login_bp
 from register import register_bp
 from seller import seller_bp
@@ -34,7 +36,7 @@ def create_app():
     app = Flask(__name__)
 
     # always register your blueprint(s) when creating application
-    blueprints = [register_bp, login_bp, seller_bp]
+    blueprints = [register_bp, login_bp, seller_bp, buyer_bp]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 

@@ -51,7 +51,7 @@ def get_area():
 
     if length < 1 or width < 1:
         return {
-            "error": "Both length and with must be positive numbers"
+            "error": "Both length and width must be positive numbers"
         }, 400
     elif length < width:
         return {

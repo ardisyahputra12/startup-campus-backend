@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     invalid_response1 = c.get("/area?length=-1&width=5")
     assert invalid_response1.json == {
-        "error": "Both length and with must be positive numbers"
+        "error": "Both length and width must be positive numbers"
     }
     assert invalid_response1.status_code == 400
 

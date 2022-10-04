@@ -6,7 +6,8 @@ A seller can do one of the following things:
     - Update the amount/price of an item
     - Access current revenue
 
-Note that each item is identified by a UNIQUE name.
+Note that each item is identified by a UNIQUE name per SELLER (different sellers can sell
+items with the same name - seller A and B can sell item X)
 
 Implement these actions with the following endpoints:
 
@@ -19,9 +20,6 @@ Implement these actions with the following endpoints:
     - price: integer (required) -> unit price (price per individual item)
 - Headers:
     - token: string (required) -> token obtained from login to identify this seller
-
-Note that each item is identified by a UNIQUE name per SELLER (different sellers can sell
-items with the same name - seller A and B can sell item X)
 
 Requirements (from the earliest to check):
 - If amount is not a positive number:
@@ -73,14 +71,14 @@ Requirements (from the earliest to check):
     - status code: 200
 
 [Get revenue]
-- URL: /seller/revenue/{name}
+- URL: /seller/revenue
 - method: GET
-- Query parameters:
-    - name: string -> name of the seller
+- Headers:
+    - token: string (required) -> token obtained from login to identify this seller
 
 Requirements (from the earliest to check):
-- If given seller doesn't exist:
-    - return {"error": "Seller is not registered"}
+- If token does not identify a seller:
+    - return {"error": "Unauthorized seller"}
     - status code: 403
 - If everything is valid:
     - calculate revenue by the total price of items sold by this seller (so far)
@@ -103,7 +101,6 @@ def add_stock():
 def update_stock():
     # IMPLEMENT THIS
     pass
-
 
 
 @seller_bp.route("/revenue", methods=["GET"])

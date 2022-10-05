@@ -32,3 +32,8 @@ docker-compose up
 
 you can start by accessing webserver at localhost:8080
 
+default username and password are:
+username: airflow
+password: airflow
+
+

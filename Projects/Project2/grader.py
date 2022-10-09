@@ -658,7 +658,7 @@ def test_end_to_end():
                 "post",
                 "/buyer/item",
                 headers={"token": token},
-                json={"item": "A1", "name": sellers[0], "amount": 5},
+                json={"item": "A1", "seller": sellers[0], "amount": 5},
                 exp_json={"error": "Unauthorized buyer"},
                 exp_code=403,
             )

@@ -1,10 +1,29 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, text
 
 
 def get_engine():
     """Creating SQLite Engine to interact"""
     return create_engine("sqlite:///Project2.db", future=True)
 
+def create_table():
+    engine = get_engine()
+    meta = MetaData()
+    Table(
+        "users",
+        meta,
+        Column("type", String, nullable=False),
+        Column("username", String, nullable=False, unique=True),
+        Column("password", String, nullable=False),
+        Column("token", String, nullable=True),
+    )
+    Table(
+        "stock",
+        meta,
+        Column("item", String, nullable=False, unique=True),
+        Column("amount", Integer, nullable=False),
+        Column("price", Integer, nullable=False),
+    )
+    meta.create_all(engine)
 
 def run_query(query, commit: bool = False):
     """Runs a query against the given SQLite database.
@@ -22,6 +41,14 @@ def run_query(query, commit: bool = False):
             conn.commit()
         else:
             return [dict(row) for row in conn.execute(query)]
+
+def error_message(msg: str, sts: int):
+    return {"error": msg}, sts
+
+def success_message(msg: str, sts: int, tkn: str = None):
+    val = {"message": msg}
+    if tkn!=None: val["token"] = tkn
+    return val, sts
 
 
 ##############################################################################################

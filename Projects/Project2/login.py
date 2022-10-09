@@ -25,12 +25,24 @@ Requirements (from the earliest to check):
         - TIPS: you can consider using standard Python library uuid to generate a random
             string for each user (https://docs.python.org/3.9/library/uuid.html)
 """
-from flask import Blueprint
+import uuid
+from flask import Blueprint, request
+from utils import run_query, error_message, success_message
 
 login_bp = Blueprint("login", __name__, url_prefix="/login")
-
+token = uuid.uuid4()
 
 @login_bp.route("", methods=["POST"])
 def login():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    # Request body:
+    #     - username: string (required)
+    #     - password: string (required)
+
+    if ("username" not in data) or ([{"password": data["password"]}] != run_query(f"SELECT password FROM users WHERE username = '{data['username']}'")):
+        return error_message("Username or password is incorrect", 401)
+    else:
+        if [{"username": data["username"]}] == run_query(f"SELECT username FROM users WHERE password = '{data['password']}'"):
+            run_query(f"UPDATE users SET token = '{token}'", commit=True)
+        return success_message("Welcome to the marketplace", 200, token)

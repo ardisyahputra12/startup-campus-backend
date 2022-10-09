@@ -55,7 +55,8 @@ Requirements (from the earliest to check):
         - return {"message": "Congratulations, you can now shop for antique items"}
         - status code: 201
 """
-from flask import Blueprint
+from flask import Blueprint, request
+from utils import run_query, error_message, success_message
 
 # this means that you can group all endpoints with prefix "/register" together
 register_bp = Blueprint("register", __name__, url_prefix="/register")
@@ -64,4 +65,25 @@ register_bp = Blueprint("register", __name__, url_prefix="/register")
 @register_bp.route("", methods=["POST"])
 def register():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    # Request body:
+    #     - type: string (required) -> "Seller" or "Buyer"
+    #     - username: string (required)
+    #     - password: string (required)
+
+    if len(data["password"]) < 8:
+        return error_message("Password must contain at least 8 characters", 400)
+    if len([val for val in data["password"] if val.islower()]) < 1:
+        return error_message("Password must contain a lowercase letter", 400)
+    if len([val for val in data["password"] if val.isupper()]) < 1:
+        return error_message("Password must contain an uppercase letter", 400)
+    if any(val.isnumeric() for val in data["password"]) == False:
+        return error_message("Password must contain a number", 400)
+    if [{"username": data["username"]}] == run_query(f"SELECT username FROM users WHERE username = '{data['username']}'"):
+        return error_message(f"Username {data['username']} already exists", 409)
+    else:
+        run_query(f"INSERT INTO users (type, username, password) VALUES {data['type'], data['username'], data['password']}", commit=True)
+        if data["type"] == "seller":
+            return success_message("Congratulations, you can now sell antique items", 201)
+        elif data["type"] == "buyer":
+            return success_message("Congratulations, you can now shop for antique items", 201)

@@ -23,13 +23,14 @@ DO NOT:
         - installed libraries (via virtual environment)
     - Copy paste exact implementation from anyone
 """
+import os
 from flask import Flask
 
 from buyer import buyer_bp
 from login import login_bp
 from register import register_bp
 from seller import seller_bp
-from utils import COL
+from utils import COL, create_table
 
 
 def create_app():
@@ -43,6 +44,11 @@ def create_app():
     # IMPLEMENT THIS
     # - setup SQLite database (if already exists, clear/reset the database)
     # - create necessary tables
+    db_name = "Project2.db"
+    if os.path.isfile(db_name):
+        os.remove(db_name)
+
+    create_table()
 
     return app
 

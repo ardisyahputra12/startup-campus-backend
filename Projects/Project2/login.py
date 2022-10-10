@@ -36,9 +36,6 @@ def login():
     # IMPLEMENT THIS
     data = request.get_json()
     token = uuid.uuid4()
-    # Request body:
-    #     - username: string (required)
-    #     - password: string (required)
 
     if ("username" not in data) or ([{"password": data["password"]}] != run_query(f"SELECT password FROM users WHERE username = '{data['username']}'")):
         return error_message("Username or password is incorrect", 401)

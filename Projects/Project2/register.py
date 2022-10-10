@@ -66,10 +66,6 @@ register_bp = Blueprint("register", __name__, url_prefix="/register")
 def register():
     # IMPLEMENT THIS
     data = request.get_json()
-    # Request body:
-    #     - type: string (required) -> "Seller" or "Buyer"
-    #     - username: string (required)
-    #     - password: string (required)
 
     if len(data["password"]) < 8:
         return error_message("Password must contain at least 8 characters", 400)

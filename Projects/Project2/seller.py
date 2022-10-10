@@ -91,21 +91,16 @@ from utils import run_query, error_message, success_message
 
 seller_bp = Blueprint("seller", __name__, url_prefix="/seller")
 
+
 @seller_bp.route("/stock", methods=["POST"])
 def add_stock():
     # IMPLEMENT THIS
     data = request.get_json()
     token = request.headers["Token"]
-    # - Request body:
-    #     - item: string (required) -> name of this item
-    #     - amount: integer (required) -> how many items to stock
-    #     - price: integer (required) -> unit price (price per individual item)
-    # - Headers:
-    #     - token: string (required) -> token obtained from login to identify this seller
 
     if (data["amount"] < 1) or (data["price"] < 1):
         return error_message("Please specify a positive amount", 400)
-    elif [{"token": token}] != run_query(f"SELECT token FROM users WHERE token = '{token}'"):
+    elif run_query(f"SELECT token FROM users WHERE token = '{token}'") == []:
         return error_message("Unauthorized seller", 403)
     elif ([{"token": token}] == run_query(f"SELECT token FROM stock WHERE item = '{data['item']}' AND token = '{token}'")) and ([{"item": data["item"]}] == run_query(f"SELECT DISTINCT item FROM stock WHERE item = '{data['item']}'")):
         return error_message("Item with the same name already exists", 400)
@@ -117,10 +112,38 @@ def add_stock():
 @seller_bp.route("/stock", methods=["PUT"])
 def update_stock():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    token = request.headers["Token"]
+
+    if ("amount" not in data) and ("price" not in data):
+        return error_message("Please specify amount or price", 400)
+    elif run_query(f"SELECT item FROM stock WHERE item = '{data['item']}'") == []:
+        return error_message("Item is not known", 400)
+    elif ("price" in data) and (data["price"] < 1):
+        return error_message("Please specify a positive amount", 400)
+    elif ("amount" in data) and (data["amount"] < 1):
+        return error_message("Please specify a positive amount OR 0", 400)
+    elif run_query(f"SELECT token FROM users WHERE token = '{token}'") == []:
+        return error_message("Unauthorized seller", 403)
+    else:
+        if "price" in data:
+            run_query(f"UPDATE stock SET price = '{data['price']}'", commit=True)
+        if "amount" in data:
+            run_query(f"UPDATE stock SET amount = '{data['amount']}'", commit=True)
+        if ("amount" in data) and ("price" in data):
+            run_query(f"UPDATE stock SET amount = '{data['amount']}', price = '{data['price']}'", commit=True)
+        return success_message("Item information is updated", 200)
 
 
 @seller_bp.route("/revenue", methods=["GET"])
 def revenue():
     # IMPLEMENT THIS
-    pass
+    token = request.headers["Token"]
+    revenue = 0
+
+    if run_query(f"SELECT token FROM stock WHERE token = '{token}'") == []:
+        return error_message("Unauthorized seller", 403)
+    else:
+        if run_query(f"SELECT item FROM stock WHERE token = '{token}' AND amount = 0"):
+            revenue = run_query(f"SELECT SUM(price) AS total FROM stock WHERE token = '{token}' AND amount = 0")[0]["total"]
+        return success_message(f"Your revenue is {revenue}", 200)

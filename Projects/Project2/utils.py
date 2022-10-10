@@ -14,14 +14,15 @@ def create_table():
         Column("type", String, nullable=False),
         Column("username", String, nullable=False, unique=True),
         Column("password", String, nullable=False),
-        Column("token", String, nullable=True),
+        Column("token", String, nullable=True, unique=True),
     )
     Table(
         "stock",
         meta,
-        Column("item", String, nullable=False, unique=True),
+        Column("item", String, nullable=False),
         Column("amount", Integer, nullable=False),
         Column("price", Integer, nullable=False),
+        Column("token", String, nullable=False)
     )
     meta.create_all(engine)
 

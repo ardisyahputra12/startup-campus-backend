@@ -102,7 +102,7 @@ def add_stock():
         return error_message("Please specify a positive amount", 400)
     elif run_query(f"SELECT token FROM users WHERE token = '{token}'") == []:
         return error_message("Unauthorized seller", 403)
-    elif ([{"token": token}] == run_query(f"SELECT token FROM stock WHERE item = '{data['item']}' AND token = '{token}'")) and ([{"item": data["item"]}] == run_query(f"SELECT DISTINCT item FROM stock WHERE item = '{data['item']}'")):
+    elif [{"item": data["item"]}] == run_query(f"SELECT item FROM stock WHERE item = '{data['item']}' AND token = '{token}'"):
         return error_message("Item with the same name already exists", 400)
     else:
         run_query(f"INSERT INTO stock VALUES {data['item'], data['amount'], data['price'], token}", commit=True)
@@ -127,11 +127,11 @@ def update_stock():
         return error_message("Unauthorized seller", 403)
     else:
         if "price" in data:
-            run_query(f"UPDATE stock SET price = '{data['price']}'", commit=True)
+            run_query(f"UPDATE stock SET price = {data['price']} WHERE item = '{data['item']}' AND token = '{token}'", commit=True)
         if "amount" in data:
-            run_query(f"UPDATE stock SET amount = '{data['amount']}'", commit=True)
+            run_query(f"UPDATE stock SET amount = {data['amount']} WHERE item = '{data['item']}' AND token = '{token}'", commit=True)
         if ("amount" in data) and ("price" in data):
-            run_query(f"UPDATE stock SET amount = '{data['amount']}', price = '{data['price']}'", commit=True)
+            run_query(f"UPDATE stock SET amount = {data['amount']}, price = {data['price']} WHERE item = '{data['item']}' AND token = '{token}'", commit=True)
         return success_message("Item information is updated", 200)
 
 
@@ -139,11 +139,9 @@ def update_stock():
 def revenue():
     # IMPLEMENT THIS
     token = request.headers["Token"]
-    revenue = 0
+    revenue = run_query(f"SELECT balance FROM users WHERE token = '{token}'")
 
     if run_query(f"SELECT token FROM stock WHERE token = '{token}'") == []:
         return error_message("Unauthorized seller", 403)
     else:
-        if run_query(f"SELECT item FROM stock WHERE token = '{token}' AND amount = 0"):
-            revenue = run_query(f"SELECT SUM(price) AS total FROM stock WHERE token = '{token}' AND amount = 0")[0]["total"]
-        return success_message(f"Your revenue is {revenue}", 200)
+        return success_message(f"Your revenue is {revenue[0]['balance']}", 200)

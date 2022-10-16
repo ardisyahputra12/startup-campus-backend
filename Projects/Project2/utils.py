@@ -14,6 +14,7 @@ def create_table():
         Column("type", String, nullable=False),
         Column("username", String, nullable=False, unique=True),
         Column("password", String, nullable=False),
+        Column("balance", String, nullable=False, server_default="0"),
         Column("token", String, nullable=True, unique=True),
     )
     Table(
@@ -22,6 +23,14 @@ def create_table():
         Column("item", String, nullable=False),
         Column("amount", Integer, nullable=False),
         Column("price", Integer, nullable=False),
+        Column("token", String, nullable=False)
+    )
+    Table(
+        "basket",
+        meta,
+        Column("seller", Integer, nullable=False),
+        Column("item", String, nullable=False),
+        Column("amount", Integer, nullable=False),
         Column("token", String, nullable=False)
     )
     meta.create_all(engine)

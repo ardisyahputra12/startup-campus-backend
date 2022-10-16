@@ -139,7 +139,8 @@ Requirements (from the earliest to check):
     - return {"message": "Payment is successsful"}
     - status code: 200
 """
-from flask import Blueprint
+from flask import Blueprint, request
+from utils import run_query, error_message, success_message
 
 buyer_bp = Blueprint("buyer", __name__, url_prefix="/buyer")
 
@@ -147,28 +148,100 @@ buyer_bp = Blueprint("buyer", __name__, url_prefix="/buyer")
 @buyer_bp.route("/item", methods=["GET"])
 def view_item():
     # IMPLEMENT THIS
-    pass
+    params = request.args
+    token = request.headers["Token"]
+    item = params.get("item", type=str)
+    seller = params.get("seller", type=str)
+
+    if run_query(f"SELECT token FROM users WHERE token = '{token}' AND type = 'buyer'") == []:
+        return error_message("Unauthorized buyer", 403)
+    elif run_query(f"SELECT item FROM stock INNER JOIN users ON users.token=stock.token WHERE item = '{item}' AND username = '{seller}'") == []:
+        return error_message("Item is not known", 400)
+    else:
+        price = run_query(f"SELECT price FROM stock INNER JOIN users ON users.token=stock.token WHERE item='{item}' AND username = '{seller}'")[0]["price"]
+        return success_message(f"Price is {price}", 200)
 
 
 @buyer_bp.route("/item", methods=["POST"])
 def add_item():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    token = request.headers["Token"]
+
+    if data["amount"] < 1:
+        return error_message("Please specify a positive amount", 400)
+    elif run_query(f"SELECT token FROM users WHERE token = '{token}' AND type = 'buyer'") == []:
+        return error_message("Unauthorized buyer", 403)
+    elif run_query(f"SELECT item FROM stock WHERE item = '{data['item']}'") == []:
+        return error_message("Item is not known", 400)
+    else:
+        if [{"item": data["item"]}] == run_query(f"SELECT item FROM basket WHERE item = '{data['item']}' AND seller = '{data['seller']}' AND token = '{token}'"):
+            run_query(f"UPDATE basket SET amount = amount + '{data['amount']}' WHERE item = '{data['item']}' AND seller = '{data['seller']}' AND token = '{token}'", commit=True)
+        else:
+            run_query(f"INSERT INTO basket VALUES {data['seller'], data['item'], data['amount'], token}", commit=True)
+        return success_message("Item is added to the basket", 201)
 
 
 @buyer_bp.route("/item", methods=["DELETE"])
 def remove_item():
     # IMPLEMENT THIS
-    pass
+    data = request.get_json()
+    token = request.headers["Token"]
+
+    if run_query(f"SELECT token FROM users WHERE token = '{token}' AND type = 'buyer'") == []:
+        return error_message("Unauthorized buyer", 403)
+    elif run_query(f"SELECT item FROM basket WHERE item = '{data['item']}'") == []:
+        return error_message("Item is not in the basket", 400)
+    else:
+        run_query(f"DELETE FROM basket WHERE item = '{data['item']}' AND seller = '{data['seller']}' AND token = '{token}'", commit=True)
+        return success_message("Item is removed from the basket", 200)
 
 
 @buyer_bp.route("/topup", methods=["POST"])
 def topup():
     # IMPLEMENT THIS
-    pass
+    amount = request.get_json()["amount"]
+    token = request.headers["Token"]
+
+    if amount < 1:
+        return error_message("Please specify a positive amount", 400)
+    elif run_query(f"SELECT token FROM users WHERE token = '{token}' AND type = 'buyer'") == []:
+        return error_message("Unauthorized buyer", 403)
+    else:
+        run_query(f"UPDATE users SET balance = '{amount}' WHERE token = '{token}' AND type = 'buyer'", commit=True)
+        return success_message("Your balance is updated", 200)
 
 
 @buyer_bp.route("pay", methods=["POST"])
 def pay():
     # IMPLEMENT THIS
-    pass
+    token = request.headers["Token"]
+    baskets = run_query(f"SELECT * FROM basket WHERE token = '{token}'")
+    buyer_balance = run_query(f"SELECT balance FROM users WHERE token = '{token}'")
+    total_price_basket = 0
+
+    if run_query(f"SELECT token FROM users WHERE token = '{token}' AND type = 'buyer'") == []:
+        return error_message("Unauthorized buyer", 403)
+    elif run_query(f"SELECT seller FROM basket WHERE token = '{token}'") == []:
+        return error_message("Basket is empty", 400)
+    for basket in baskets:
+        stocks = run_query(f"SELECT * FROM stock WHERE item = '{basket['item']}'")
+        for stock in stocks:
+            if [{"username": basket["seller"]}] == run_query(f"SELECT username FROM users WHERE token = '{stock['token']}'"):
+                total = stock["price"] * basket["amount"]
+                total_price_basket += total
+    for basket in baskets:
+        stocks = run_query(f"SELECT * FROM stock WHERE item = '{basket['item']}'")
+        for stock in stocks:
+            if [{"username": basket["seller"]}] == run_query(f"SELECT username FROM users WHERE token = '{stock['token']}'"):
+                if (basket["amount"] > stock["amount"]):
+                    return error_message("Insufficient stock", 400)
+                elif total_price_basket > int(buyer_balance[0]["balance"]):
+                    diff = total_price_basket - int(buyer_balance[0]["balance"])
+                    return error_message(f"Please top up {diff}", 400)
+                else:
+                    run_query(f"UPDATE users SET balance = balance + ({stock['price'] * basket['amount']}) WHERE username = '{basket['seller']}' AND token = '{stock['token']}'", commit=True)
+                    run_query(f"UPDATE stock SET amount = amount - {basket['amount']} WHERE item = '{basket['item']}' AND token = '{stock['token']}'", commit=True)
+    run_query(f"UPDATE users SET balance = balance - {total_price_basket} WHERE token = '{token}'", commit=True)
+    run_query(f"DELETE FROM basket WHERE token = '{token}'", commit=True)
+    return success_message("Payment is successsful", 200)

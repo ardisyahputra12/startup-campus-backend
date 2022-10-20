@@ -41,12 +41,14 @@ In this assignment, you will try to do the following :
     - flask app should be deployed within port 5000
     - flask app container name should be "library"
     - db will be deployed within port 5432 
+    - db will be use postgresql image
     - db container name should be "library-db"
     - both db and flask app must be accessible from outside your vm
-- deploy this application using docker in cloud
+- deploy this application using docker in cloud, u can use gcp compute engine vm instance
+- you should publish your flask image to docker hub: https://docs.docker.com/docker-hub/#step-5-build-and-push-a-container-image-to-docker-hub-from-your-computer
 
 Notes:
-- for those who using GPC, you should open both port 5000 and 5432, for more information: https://cloud.google.com/vpc/docs/using-firewalls
+- for those who using GCP, you should open both port 5000 and 5432, for more information: https://cloud.google.com/vpc/docs/using-firewalls
 
 
 

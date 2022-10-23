@@ -1,1 +1,13 @@
 # create your docker-compose here
+version: "3.9"
+services:
+  flask-app:
+    build: .
+    container_name: library
+    expose: 5000
+    depend_on: db
+
+  db:
+    images: postgresql
+    port: 5432
+    container_name: library-db

@@ -2,12 +2,26 @@
 version: "3.9"
 services:
   flask-app:
-    build: .
     container_name: library
-    expose: 5000
-    depend_on: db
-
+    build: .
+    ports:
+      - 5000:5000
+    networks:
+      - backend
+    depends_on:
+      - db
+    env_file: .env
+    restart: always
   db:
-    images: postgresql
-    port: 5432
     container_name: library-db
+    image: postgres:14
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+    env_file: .env
+    restart: always
+networks:
+  backend:
+    driver: bridge
+    name: backend

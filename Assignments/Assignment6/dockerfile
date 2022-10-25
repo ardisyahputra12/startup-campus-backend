@@ -1,14 +1,10 @@
 # create your dockerfile here, for more information, read readme.md
 FROM python:3.9-slim-buster
-
-# start coding di /src
 WORKDIR /app
 
-# install requirements
 COPY requirements.txt requirements.txt
 RUN python3.9 -m pip install -r requirements.txt
 
-# COPY application file(s)
-COPY ./app/app.py app/app.py
+COPY /app .
 
-CMD ["flask", "--app", "./app/app.py", "--debug", "run"]
+CMD ["flask", "--app", "app.py", "--debug", "run", "--host=0.0.0.0"]

@@ -56,7 +56,7 @@ If you encounter any issues understanding the problem statement, feel free to as
 
 ## Grading
 
-Your grade will be mainly deducd by the amount of test cases you manage to pass across the whole problem sets. See Testing on how to check your live grades.
+Your grade will be mainly deduced by the amount of test cases you manage to pass across the whole problem sets and you mentor should be able to pull your docker image using `docker pull`. See Testing on how to check your live grades.
 
 Mentors will also check your codes (in the Merge Request) to ensure no cheating attempts is performed.
 
@@ -76,7 +76,19 @@ docker-compose up
 - you will be able to access your app via curl to localhost:5000
 - you will be able to access your postgres db with this command:
 ```
-docker exec -it library-db -U users -d library-db
+docker exec -it library-db psql -U users -d library-db
+```
+
+to test your score, you should change a the value of  variable `YOUR_IP` in grader, then run
+
+```
+python3 -m grader
+```
+
+then to check whether your image can be pulled or not, change the value variable `IMAGE_REPOSITORY` in Makefile with your docker hub repository, then run
+
+```
+make pull-image
 ```
 
 ## Submission

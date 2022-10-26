@@ -77,9 +77,9 @@ docker-compose up
 - you will be able to access your postgres db with this command:
 ```
 docker exec -it library-db psql -U users -d library-db
-```
 
-to test your score, you should change a the value of  variable `YOUR_IP` in grader, then run
+```
+to test your score, you should change a the value of  variable `YOUR_IP` with in grader with your vm ip address, then run
 
 ```
 python3 -m grader
@@ -93,4 +93,5 @@ make pull-image
 
 ## Submission
 
-Push your changes to the branch (created via Merge Request) and simply **copy paste the Merge Request URL** into the corresponding **Assignment folder** in your **Google Classroom** account.
+- Push your changes to the branch (created via Merge Request) and simply **copy paste the Merge Request URL** into the corresponding **Assignment folder** in your **Google Classroom** account.
+- you also should also include changes in variable `YOUR_IP` and `IMAGE_REPOSITORY` into your commit

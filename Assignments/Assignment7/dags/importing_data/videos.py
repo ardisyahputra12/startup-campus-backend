@@ -14,7 +14,7 @@ def create_table_videos():
     - "video_id": TEXT, can't be NULL, must be unique
     - "title": TEXT, can't be NULL
     - "length (min)": FLOAT/REAL, default = 0.0
-    - "category_id": INT, linked with categories.id
+    - "category_id": INT
     - "created_at": TEXT, can't be NULL
     """
     pass

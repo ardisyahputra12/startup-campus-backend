@@ -4,6 +4,7 @@ In this file, you will need to
 -  insert most watched videos to table "most_watched_videos" in destination database
 """
 
+
 # IMPLEMENT THIS
 def create_table_most_watched_videos():
     """Create table "most_watched_videos" in destination database with the following constraints:

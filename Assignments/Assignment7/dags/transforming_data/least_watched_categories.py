@@ -4,10 +4,11 @@ In this file, you will need to
 - insert least watched categories to  table "least_watched_categories" in destination database
 """
 
+
 # IMPLEMENT THIS
 def create_table_least_watched_categories():
-    """Create table "categories" in SQLite with the following constraints:
-    - "ID": INTEGER, can't be NULL, must be unique
+    """Create table "least_watched_category" in destination database with the following constraints:
+    - "category_id": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
     - "count": INT
     """

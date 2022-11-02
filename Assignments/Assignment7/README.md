@@ -31,7 +31,7 @@ You can now start working on your local machine by clicking  `Code > Check out b
 
 In this assignment, you will try to do the following :
 - create data pipeline that should be look like this
-![](../..//images/airflowexample.png)
+- ![](../..//images/airflowexample.png)
 - for copy views definition, open **importing_data/views.py**
 - for copy category definition, open **importing_data/category.py**
 - for copy users definition, open **importing_data/users.py**
@@ -42,8 +42,6 @@ In this assignment, you will try to do the following :
 
 Notes:
 - all the leaf task should running only if it's parent already success
-
-
 
 If you encounter any issues understanding the problem statement, feel free to ask and reach out to your mentors!
 

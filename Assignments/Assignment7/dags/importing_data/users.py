@@ -8,6 +8,7 @@ see creds.py for both db credential
 
 """
 
+
 # IMPLEMENT THIS
 def create_table_users():
     """Create table "users" in destination database with the following constraints:

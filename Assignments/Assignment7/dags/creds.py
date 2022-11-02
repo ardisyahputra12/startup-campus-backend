@@ -1,5 +1,5 @@
-sources_creds = {
-    "host": "35.198.203.10",
+source_creds = {
+    "host": "35.240.202.103",
     "port": "5432",
     "user": "students",
     "pass": "gysxKk",
@@ -7,7 +7,7 @@ sources_creds = {
 }
 
 destination_creds = {
-    "host": "destination_db",
+    "host": "destination-db",
     "port": "5432",
     "user": "destination",
     "pass": "password",

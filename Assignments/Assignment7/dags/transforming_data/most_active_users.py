@@ -4,6 +4,7 @@ In this file, you will need to
 - insert most active users to table "most_active_users" in destination database
 """
 
+
 # IMPLEMENT THIS
 def create_table_most_active_users():
     """Create table "most_active_users" in destination table with the following constraints:
@@ -33,3 +34,4 @@ def insert_most_active_users():
 
     create table "most_active_users" if there is no table "most_active_users"
     """
+    pass

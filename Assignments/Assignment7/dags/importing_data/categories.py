@@ -8,7 +8,6 @@ see creds.py for both db credential
 
 """
 
-
 # IMPLEMENT THIS
 def create_table_categories():
     """Create table "categories" in SQLite with the following constraints:

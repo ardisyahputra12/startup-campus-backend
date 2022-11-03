@@ -64,25 +64,13 @@ then run
 docker-compose up
 ```
 
-- you will be able to access your app via curl to localhost:5000
-- you will be able to access your postgres db with this command:
-```
-docker exec -it library-db psql -U users -d library-db
+- you will be able to access your airflow via localhost:8080
+- open videos_dag and run your dag
+- all your pipeline should be passed
+- all table should be created in "destination" db with the correct data
 
-```
-to test your score, you should change a the value of  variable `YOUR_IP` with in grader with your vm ip address, then run
-
-```
-python3 -m grader
-```
-
-then to check whether your image can be pulled or not, change the value variable `IMAGE_REPOSITORY` in Makefile with your docker hub repository, then run
-
-```
-make pull-image
-```
+grader will be announce soon
 
 ## Submission
 
 - Push your changes to the branch (created via Merge Request) and simply **copy paste the Merge Request URL** into the corresponding **Assignment folder** in your **Google Classroom** account.
-- you also should also include changes in variable `YOUR_IP` and `IMAGE_REPOSITORY` into your commit

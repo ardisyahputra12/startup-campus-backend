@@ -10,7 +10,7 @@ see creds.py for both db credential
 
 # IMPLEMENT THIS
 def create_table_categories():
-    """Create table "categories" in SQLite with the following constraints:
+    """Create table "categories" in destination table with the following constraints:
     - "ID": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
     """

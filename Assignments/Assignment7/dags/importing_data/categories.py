@@ -7,6 +7,18 @@ Notes:
 see creds.py for both db credential
 
 """
+from sqlalchemy import (
+    Table,
+    Column,
+    Text,
+    Integer,
+)
+from dags import (
+    metadata_obj_destination,
+    get_engine_destination,
+    copy_data,
+)
+
 
 # IMPLEMENT THIS
 def create_table_categories():
@@ -14,7 +26,13 @@ def create_table_categories():
     - "ID": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
     """
-    pass
+    Table(
+        "categories",
+        metadata_obj_destination,
+        Column("ID", Integer, primary_key=True),
+        Column("Category_name", Text, nullable=False, unique=True),
+    )
+    metadata_obj_destination.create_all(get_engine_destination())
 
 
 # IMPLEMENT THIS
@@ -23,4 +41,4 @@ def copy_categories():
 
     create table categories first if there is no table categories
     """
-    pass
+    copy_data("categories")

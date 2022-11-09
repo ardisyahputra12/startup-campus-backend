@@ -7,6 +7,18 @@ Notes:
 see creds.py for both db credential
 
 """
+from sqlalchemy import (
+    Table,
+    Column,
+    Text,
+    DateTime,
+    ForeignKey,
+)
+from dags import (
+    metadata_obj_destination,
+    get_engine_destination,
+    copy_data,
+)
 
 
 def create_table_views():
@@ -19,7 +31,16 @@ def create_table_views():
 
     if table already exist, delete all data from table
     """
-    pass
+    Table(
+        "views",
+        metadata_obj_destination,
+        Column("view_id", Text, primary_key=True),
+        Column("user_id", Text, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE')),
+        Column("video_id", Text, ForeignKey('videos.video_id', ondelete='CASCADE', onupdate='CASCADE')),
+        Column("started_at", DateTime, nullable=False),
+        Column("finished_at", DateTime),
+    )
+    metadata_obj_destination.create_all(get_engine_destination())
 
 
 # IMPLEMENT THIS
@@ -28,4 +49,4 @@ def copy_views():
 
     create table views first if there is no table views
     """
-    pass
+    copy_data("views")

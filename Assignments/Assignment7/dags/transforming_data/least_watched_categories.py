@@ -20,7 +20,7 @@ from utils import (
 
 # IMPLEMENT THIS
 def create_table_least_watched_categories():
-    """Create table "least_watched_category" in destination database with the following constraints:
+    """Create table "least_watched_categories" in destination database with the following constraints:
     - "category_id": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
     - "count": INT

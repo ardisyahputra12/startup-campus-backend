@@ -15,7 +15,7 @@ from sqlalchemy import (
     Integer,
     ForeignKey,
 )
-from dags import (
+from utils import (
     metadata_obj_destination,
     get_engine_destination,
     copy_data,

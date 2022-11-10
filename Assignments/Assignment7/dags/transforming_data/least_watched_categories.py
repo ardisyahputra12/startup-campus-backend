@@ -8,11 +8,13 @@ from sqlalchemy import (
     Column,
     Text,
     Integer,
+    insert,
 )
-from dags import (
+from utils import (
     metadata_obj_destination,
     get_engine_destination,
-    copy_data,
+    run_query_destination,
+    run_query_source,
 )
 
 
@@ -27,7 +29,7 @@ def create_table_least_watched_categories():
         "least_watched_category",
         metadata_obj_destination,
         Column("category_id", Integer, primary_key=True),
-        Column("Category_name", Text, nullable=False, unique=True),
+        Column("category_name", Text, nullable=False, unique=True),
         Column("count", Integer),
     )
     metadata_obj_destination.create_all(get_engine_destination())
@@ -45,33 +47,25 @@ def insert_least_watched_categories():
     create table "least_watched_categories" first if there there is no table "least_watched_categories"
 
     """
-    # """Return the category of videos that have the least number of views.
-
-    # If there are multiple videos in a category C, then we count the total number of views
-    # for all such videos to represent C.
-
-    # Output a list of N categories ordered from the least watched.
-
-    # If there are several users with the same watching duration, order alphabetically (e.g.
-    # Alan is higher than Brown).
-
-    # N: a positive integer
-
-    # Example:
-    #     N = 1
-    #     return ["Film & Animation"]
-    # """
-    # query = run_query(
-    #     f'''SELECT result."Category name", COUNT (result."Category name") AS total
-    #     FROM (
-    #         SELECT c."Category name", v.title, v.video_id
-    #         FROM categories c
-    #         INNER JOIN videos v ON c."ID" = v.category_id
-    #     ) result
-    #     INNER JOIN views ON views.video_id = result.video_id
-    #     GROUP BY result."Category name"
-    #     ORDER BY total
-    #     LIMIT {N}'''
-    # )
-    # return [query[i]["Category name"] for i in range(N)]
-    pass
+    query = run_query_source(
+        f'''SELECT result."Category name", result.ID, COUNT (result."Category name") AS total
+        FROM (
+            SELECT c."Category name", c.ID, v.title, v.video_id
+            FROM categories c
+            INNER JOIN videos v ON c."ID" = v.category_id
+        ) result
+        INNER JOIN views ON views.video_id = result.video_id
+        GROUP BY result."Category name"
+        ORDER BY total
+        '''
+    )
+    for i in range(len(query)):
+        run_query_destination(
+            insert(
+                metadata_obj_destination.tables["least_watched_category"]
+            ).values(
+                category_id= query[i]["ID"],
+                category_name=query[i]["Category name"],
+                count=query[i]["total"]
+            ), True
+        )

@@ -8,11 +8,13 @@ from sqlalchemy import (
     Column,
     Text,
     Integer,
+    insert,
 )
-from dags import (
+from utils import (
     metadata_obj_destination,
     get_engine_destination,
-    copy_data,
+    run_query_destination,
+    run_query_source,
 )
 
 
@@ -52,43 +54,24 @@ def insert_most_active_users():
 
     create table "most_active_users" if there is no table "most_active_users"
     """
-    # """Return top N users with the longest watching activity.
-
-    # Total duration for a user is calculated as follows;
-    # - When a user U watches video V, it will be registered as a view (1 row on table Views)
-    # - The watching duration is NOT the length of V, but the difference between "finished_at"
-    #     and "started_at" for each view
-    # - Accumulate the duration for all such views for user N
-    # - Convert the duration into MINUTES
-
-    # Output a list of [username, duration] and we round the duration to the nearest integer.
-
-    # If there are several users with the same watching duration, order alphabetically (e.g.
-    # Alan is higher than Brown).
-
-    # Rounding happens after the sorting (e.g. Brown with 143.2 is still considered higher in
-    # the list than Alan with 143.1 even though both view time will be displayed as 143)
-
-    # N: a positive integer
-
-    # Example:
-    #     N = 3,
-    #     return [
-    #         ["Francis Frank", 911.0],
-    #         ["Renee Fitzgerald", 825.0],
-    #         ["Rylee Giles", 815.0]
-    #     ]
-    # """
-    # query = run_query(
-    #     f'''SELECT result.name, round(sum(duration)) AS total_duration
-    #     FROM (
-    #         SELECT name, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
-    #         FROM users
-    #         INNER JOIN views ON users.user_id = views.user_id
-    #     ) result
-    #     GROUP BY result.name
-    #     ORDER BY sum(duration) DESC, name
-    #     LIMIT {N}'''
-    # )
-    # return [list(query[i].values()) for i in range(N)]
-    pass
+    query = run_query_source(
+        f'''SELECT result.name, result.user_id, round(sum(duration)) AS total_duration
+        FROM (
+            SELECT name, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
+            FROM users
+            INNER JOIN views ON users.user_id = views.user_id
+        ) result
+        GROUP BY result.name
+        ORDER BY sum(duration) DESC, name
+        '''
+    )
+    for i in range(len(query)):
+        run_query_destination(
+            insert(
+                metadata_obj_destination.tables["most_active_users"]
+            ).values(
+                user_id= query[i]["user_id"],
+                name=query[i]["name"],
+                duration=query[i]["total_duration"]
+            ), True
+        )

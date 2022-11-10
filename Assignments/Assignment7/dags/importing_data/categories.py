@@ -13,7 +13,7 @@ from sqlalchemy import (
     Text,
     Integer,
 )
-from dags import (
+from utils import (
     metadata_obj_destination,
     get_engine_destination,
     copy_data,

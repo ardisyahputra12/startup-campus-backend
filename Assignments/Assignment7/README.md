@@ -69,7 +69,11 @@ docker-compose up
 - all your pipeline should be passed
 - all table should be created in "destination" db with the correct data
 
-grader will be announce soon
+you can check your grade with
+
+```
+python3 -m grader.py
+```
 
 ## Submission
 

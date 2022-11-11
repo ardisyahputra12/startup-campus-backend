@@ -26,7 +26,7 @@ def create_table_least_watched_categories():
     - "count": INT
     """
     Table(
-        "least_watched_category",
+        "least_watched_categories",
         metadata_obj_destination,
         Column("category_id", Integer, primary_key=True),
         Column("category_name", Text, nullable=False, unique=True),
@@ -62,7 +62,7 @@ def insert_least_watched_categories():
     for i in range(len(query)):
         run_query_destination(
             insert(
-                metadata_obj_destination.tables["least_watched_category"]
+                metadata_obj_destination.tables["least_watched_categories"]
             ).values(
                 category_id= query[i]["ID"],
                 category_name=query[i]["Category name"],

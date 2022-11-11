@@ -29,7 +29,7 @@ def create_table_least_watched_categories():
         "least_watched_categories",
         metadata_obj_destination,
         Column("category_id", Integer, primary_key=True),
-        Column("category_name", Text, nullable=False, unique=True),
+        Column("Category name", Text, nullable=False, unique=True),
         Column("count", Integer),
     )
     metadata_obj_destination.create_all(get_engine_destination())
@@ -51,8 +51,8 @@ def insert_least_watched_categories():
         f'''SELECT result."Category name", result.ID, COUNT (result."Category name") AS total
         FROM (
             SELECT c."Category name", c.ID, v.title, v.video_id
-            FROM categories c
-            INNER JOIN videos v ON c."ID" = v.category_id
+            FROM categories AS c
+            INNER JOIN videos AS v ON c."ID" = v.category_id
         ) result
         INNER JOIN views ON views.video_id = result.video_id
         GROUP BY result."Category name"
@@ -60,12 +60,10 @@ def insert_least_watched_categories():
         '''
     )
     for i in range(len(query)):
-        run_query_destination(
-            insert(
-                metadata_obj_destination.tables["least_watched_categories"]
-            ).values(
-                category_id= query[i]["ID"],
-                category_name=query[i]["Category name"],
-                count=query[i]["total"]
-            ), True
-        )
+        q = f'''
+            INSERT INTO least_watched_categories VALUES {
+                query[i]["ID"],
+                query[i]["Category name"],
+                query[i]["total"]
+        }'''
+        run_query_destination(q, True)

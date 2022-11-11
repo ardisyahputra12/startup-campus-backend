@@ -55,12 +55,10 @@ def insert_most_watched_videos():
         '''
     )
     for i in range(len(query)):
-        run_query_destination(
-            insert(
-                metadata_obj_destination.tables["most_watched_videos"]
-            ).values(
-                video_id= query[i]["video_id"],
-                title=query[i]["title"],
-                count=query[i]["total_view"]
-            ), True
-        )
+        q = f'''
+            INSERT INTO most_watched_videos VALUES {
+                query[i]["video_id"],
+                query[i]["title"],
+                query[i]["total_view"]
+        }'''
+        run_query_destination(q, True)

@@ -17,7 +17,8 @@ from sqlalchemy import (
 from utils import (
     metadata_obj_destination,
     get_engine_destination,
-    copy_data,
+    run_query_destination,
+    run_query_source,
 )
 
 
@@ -35,8 +36,8 @@ def create_table_views():
         "views",
         metadata_obj_destination,
         Column("view_id", Text, primary_key=True),
-        Column("user_id", Text, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE')),
-        Column("video_id", Text, ForeignKey('videos.video_id', ondelete='CASCADE', onupdate='CASCADE')),
+        Column("user_id", Text, ForeignKey('users.user_id')),
+        Column("video_id", Text, ForeignKey('videos.video_id')),
         Column("started_at", DateTime, nullable=False),
         Column("finished_at", DateTime),
     )
@@ -49,4 +50,13 @@ def copy_views():
 
     create table views first if there is no table views
     """
-    copy_data("views")
+    data = run_query_source(f"SELECT * FROM views")
+    for el in data:
+        query = f'''INSERT INTO views VALUES {
+            el["view_id"],
+            el["user_id"],
+            el["video_id"],
+            format(el["started_at"]),
+            format(el["finished_at"])
+        }'''
+        run_query_destination(query, commit=True)

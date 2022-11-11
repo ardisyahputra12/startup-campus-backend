@@ -57,7 +57,7 @@ def insert_most_active_users():
     query = run_query_source(
         f'''SELECT result.name, result.user_id, round(sum(duration)) AS total_duration
         FROM (
-            SELECT name, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
+            SELECT name, user_id, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
             FROM users
             INNER JOIN views ON users.user_id = views.user_id
         ) result
@@ -66,12 +66,10 @@ def insert_most_active_users():
         '''
     )
     for i in range(len(query)):
-        run_query_destination(
-            insert(
-                metadata_obj_destination.tables["most_active_users"]
-            ).values(
-                user_id= query[i]["user_id"],
-                name=query[i]["name"],
-                duration=query[i]["total_duration"]
-            ), True
-        )
+        q = f'''
+            INSERT INTO most_active_users VALUES {
+                query[i]["user_id"],
+                query[i]["name"],
+                query[i]["total_duration"]
+        }'''
+        run_query_destination(q, True)

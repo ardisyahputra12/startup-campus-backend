@@ -16,7 +16,8 @@ from sqlalchemy import (
 from utils import (
     metadata_obj_destination,
     get_engine_destination,
-    copy_data,
+    run_query_destination,
+    run_query_source,
 )
 
 
@@ -48,4 +49,13 @@ def copy_users():
     create table users first if there is no table users
 
     """
-    copy_data("users")
+    data = run_query_source(f"SELECT * FROM users")
+    for el in data:
+        query = f'''INSERT INTO users VALUES {
+            el["user_id"],
+            el["name"],
+            el["password"],
+            el["followers"],
+            format(el["registered_at"])
+        }'''
+        run_query_destination(query, commit=True)

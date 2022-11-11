@@ -18,7 +18,8 @@ from sqlalchemy import (
 from utils import (
     metadata_obj_destination,
     get_engine_destination,
-    copy_data,
+    run_query_destination,
+    run_query_source,
 )
 
 
@@ -36,8 +37,8 @@ def create_table_videos():
         metadata_obj_destination,
         Column("video_id", Text, primary_key=True),
         Column("title", Text, nullable=False),
-        Column("length_(min)", Float, default = 0.0),
-        Column("category_id", Integer, ForeignKey('categories.ID', ondelete='CASCADE', onupdate='CASCADE')),
+        Column("length (min)", Float, default = 0.0),
+        Column("category_id", Integer, ForeignKey('categories.ID')),
         Column("created_at", Text, nullable=False),
     )
     metadata_obj_destination.create_all(get_engine_destination())
@@ -49,4 +50,13 @@ def copy_videos():
 
     create table videos first if there is no table videos
     """
-    copy_data("videos")
+    data = run_query_source(f"SELECT * FROM videos")
+    for el in data:
+        query = f'''INSERT INTO videos VALUES {
+            el["video_id"],
+            el["title"],
+            el["length (min)"],
+            el["category_id"],
+            format(el["created_at"])
+        }'''
+        run_query_destination(query, commit=True)

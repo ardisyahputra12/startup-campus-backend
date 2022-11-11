@@ -150,11 +150,11 @@ def test_importing_data():
             run_query("select * from most_watched_videos limit 70"),
             cases.most_watched_videos,
         )
-    # with Scorer(5, "most_active_users"):
-    #     assert_eq(
-    #         run_query("select * from most_active_users limit 70"),
-    #         cases.most_active_users,
-    #     )
+    with Scorer(5, "most_active_users"):
+        assert_eq(
+            run_query("select * from most_active_users limit 70"),
+            cases.most_active_users,
+        )
     with Scorer(5, "least_watched_categories"):
         assert_eq(
             run_query("select * from least_watched_categories limit 70"),

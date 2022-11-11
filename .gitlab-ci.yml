@@ -44,16 +44,22 @@ before_script:
 #     - cd Assignments/Assignment4
 #     - python3.9 -m grader
 
-grade-assignment6:
+# grade-assignment6:
+#   stage: grade
+#   script:
+#     - cd Assignments/Assignment6
+#     - python3.9 -m grader
+
+
+
+# grade-proejct2:
+#   stage: grade
+#   script:
+#     - cd Projects/Project2
+#     - python3.9 -m grader
+
+grade-assignment7:
   stage: grade
   script:
-    - cd Assignments/Assignment6
-    - python3.9 -m grader
-
-
-
-grade-proejct2:
-  stage: grade
-  script:
-    - cd Projects/Project2
+    - cd Assignments/Assignment7
     - python3.9 -m grader

@@ -59,6 +59,7 @@ def insert_least_watched_categories():
         ORDER BY total
         '''
     )
+    run_query_destination("DELETE FROM least_watched_categories", commit=True)
     for i in range(len(query)):
         q = f'''
             INSERT INTO least_watched_categories VALUES {

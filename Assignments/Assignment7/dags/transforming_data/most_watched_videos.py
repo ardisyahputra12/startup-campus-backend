@@ -54,6 +54,7 @@ def insert_most_watched_videos():
         ORDER BY total_view DESC, created_at DESC
         '''
     )
+    run_query_destination("DELETE FROM most_watched_videos", commit=True)
     for i in range(len(query)):
         q = f'''
             INSERT INTO most_watched_videos VALUES {

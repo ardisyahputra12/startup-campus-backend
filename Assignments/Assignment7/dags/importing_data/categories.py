@@ -43,6 +43,7 @@ def copy_categories():
     create table categories first if there is no table categories
     """
     data = run_query_source(f"SELECT * FROM categories")
+    run_query_destination("DELETE FROM categories", commit=True)
     for el in data:
         query = f'''INSERT INTO categories VALUES {
             el["ID"],

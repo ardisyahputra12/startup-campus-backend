@@ -50,6 +50,7 @@ def copy_users():
 
     """
     data = run_query_source(f"SELECT * FROM users")
+    run_query_destination("DELETE FROM users", commit=True)
     for el in data:
         query = f'''INSERT INTO users VALUES {
             el["user_id"],

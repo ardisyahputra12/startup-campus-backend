@@ -65,6 +65,7 @@ def insert_most_active_users():
         ORDER BY sum(duration) DESC, name
         '''
     )
+    run_query_destination("DELETE FROM most_active_users", commit=True)
     for i in range(len(query)):
         q = f'''
             INSERT INTO most_active_users VALUES {

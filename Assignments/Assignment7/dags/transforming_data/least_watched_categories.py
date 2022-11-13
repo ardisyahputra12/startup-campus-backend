@@ -47,15 +47,16 @@ def insert_least_watched_categories():
     create table "least_watched_categories" first if there there is no table "least_watched_categories"
 
     """
+    create_table_least_watched_categories()
     query = run_query_source(
-        f'''SELECT result."Category name", result.ID, COUNT (result."Category name") AS total
+        f'''SELECT result."Category name", result."ID", COUNT (result."Category name") AS total
         FROM (
-            SELECT c."Category name", c.ID, v.title, v.video_id
+            SELECT c."Category name", c."ID", v.title, v.video_id
             FROM categories AS c
             INNER JOIN videos AS v ON c."ID" = v.category_id
         ) result
         INNER JOIN views ON views.video_id = result.video_id
-        GROUP BY result."Category name"
+        GROUP BY result."Category name", result."ID"
         ORDER BY total
         '''
     )

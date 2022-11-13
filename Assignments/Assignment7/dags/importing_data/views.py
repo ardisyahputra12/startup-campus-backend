@@ -32,16 +32,26 @@ def create_table_views():
 
     if table already exist, delete all data from table
     """
-    Table(
-        "views",
-        metadata_obj_destination,
-        Column("view_id", Text, primary_key=True),
-        Column("user_id", Text, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False),
-        Column("video_id", Text, ForeignKey('videos.video_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False),
-        Column("started_at", DateTime, nullable=False),
-        Column("finished_at", DateTime),
-    )
-    metadata_obj_destination.create_all(get_engine_destination())
+    # Table(
+    #     "views",
+    #     metadata_obj_destination,
+    #     Column("view_id", Text, primary_key=True),
+    #     Column("user_id", Text, ForeignKey('users.user_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False),
+    #     Column("video_id", Text, ForeignKey('videos.video_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False),
+    #     Column("started_at", DateTime, nullable=False),
+    #     Column("finished_at", DateTime),
+    # )
+    # metadata_obj_destination.create_all(get_engine_destination())
+    run_query_destination('''CREATE TABLE IF NOT EXISTS views (
+        view_id TEXT NOT NULL,
+        user_id TEXT,
+        video_id TEXT,
+        started_at TEXT NOT NULL,
+        finished_at TEXT,
+        PRIMARY KEY (view_id),
+        FOREIGN KEY (user_id) REFERENCES users (user_id),
+        FOREIGN KEY (video_id) REFERENCES videos (video_id)
+    )''', commit=True)
 
 
 # IMPLEMENT THIS
@@ -51,6 +61,7 @@ def copy_views():
     create table views first if there is no table views
     """
     data = run_query_source(f"SELECT * FROM views")
+    create_table_views()
     run_query_destination("DELETE FROM views", commit=True)
     for el in data:
         query = f'''INSERT INTO views VALUES {

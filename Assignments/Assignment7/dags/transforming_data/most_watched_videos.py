@@ -46,12 +46,13 @@ def insert_most_watched_videos():
     create table "most_watched_videos" if there is no table "most_watched_videos"
 
     """
+    create_table_most_watched_videos()
     query = run_query_source(
-        f'''SELECT video_id, title, COUNT (views.view_id) AS total_view, created_at
+        f'''SELECT videos.video_id, videos.title, COUNT (views.view_id) AS total_view, videos.created_at
         FROM videos
         JOIN views on views.video_id = videos.video_id
-        GROUP BY title, created_at
-        ORDER BY total_view DESC, created_at DESC
+        GROUP BY videos.video_id, videos.title, videos.created_at
+        ORDER BY total_view DESC, videos.created_at DESC
         '''
     )
     run_query_destination("DELETE FROM most_watched_videos", commit=True)

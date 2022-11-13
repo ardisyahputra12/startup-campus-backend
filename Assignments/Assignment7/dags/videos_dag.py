@@ -21,23 +21,23 @@ from transforming_data.most_watched_videos import create_table_most_watched_vide
 from transforming_data.least_watched_categories import create_table_least_watched_categories, insert_least_watched_categories
 
 
-create_table_users()
-create_table_categories()
-create_table_videos()
-create_table_views()
+# create_table_users()
+# create_table_categories()
+# create_table_videos()
+# create_table_views()
 
-create_table_least_watched_categories()
-create_table_most_watched_videos()
-create_table_most_active_users()
+# create_table_least_watched_categories()
+# create_table_most_watched_videos()
+# create_table_most_active_users()
 
-copy_users()
-copy_categories()
-copy_videos()
-copy_views()
+# copy_users()
+# copy_categories()
+# copy_videos()
+# copy_views()
 
-insert_least_watched_categories()
-insert_most_watched_videos()
-insert_most_active_users()
+# insert_least_watched_categories()
+# insert_most_watched_videos()
+# insert_most_active_users()
 
 # create your dag and task here
 with DAG(

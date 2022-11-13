@@ -54,14 +54,15 @@ def insert_most_active_users():
 
     create table "most_active_users" if there is no table "most_active_users"
     """
+    create_table_most_active_users()
     query = run_query_source(
         f'''SELECT result.name, result.user_id, round(sum(duration)) AS total_duration
         FROM (
-            SELECT name, user_id, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
+            SELECT users.name, users.user_id, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
             FROM users
             INNER JOIN views ON users.user_id = views.user_id
         ) result
-        GROUP BY result.name
+        GROUP BY result.name, result.user_id
         ORDER BY sum(duration) DESC, name
         '''
     )

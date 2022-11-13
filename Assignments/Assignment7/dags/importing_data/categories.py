@@ -27,15 +27,19 @@ def create_table_categories():
     - "ID": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
     """
-    Table(
-        "categories",
-        metadata_obj_destination,
-        Column("ID", Integer, primary_key=True),
-        Column("Category name", Text, nullable=False, unique=True),
-    )
-    metadata_obj_destination.create_all(get_engine_destination())
+    # Table(
+    #     "categories",
+    #     metadata_obj_destination,
+    #     Column("ID", Integer, primary_key=True),
+    #     Column("Category name", Text, nullable=False, unique=True),
+    # )
+    # metadata_obj_destination.create_all(get_engine_destination())
+    run_query_destination('''CREATE TABLE IF NOT EXISTS categories (
+        ID INTEGER NOT NULL UNIQUE,
+        "Category name" TEXT NOT NULL UNIQUE
+    )''', commit=True)
 
-
+# PRIMARY KEY
 # IMPLEMENT THIS
 def copy_categories():
     """Copy all rows in table "categories" from PostgreSQL to destination table.
@@ -43,6 +47,7 @@ def copy_categories():
     create table categories first if there is no table categories
     """
     data = run_query_source(f"SELECT * FROM categories")
+    create_table_categories()
     run_query_destination("DELETE FROM categories", commit=True)
     for el in data:
         query = f'''INSERT INTO categories VALUES {

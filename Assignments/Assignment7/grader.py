@@ -119,7 +119,7 @@ class Scorer:
 engine_uri = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
     destination_creds["user"],
     destination_creds["pass"],
-    "localhost",
+    "34.87.145.185",                            #"localhost"
     destination_creds["port"],
     destination_creds["db"],
 )

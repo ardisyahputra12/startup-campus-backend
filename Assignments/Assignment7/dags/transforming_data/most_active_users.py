@@ -8,13 +8,21 @@ from sqlalchemy import (
     Column,
     Text,
     Integer,
-    insert,
 )
 from utils import (
-    metadata_obj_destination,
-    get_engine_destination,
-    run_query_destination,
+    create_table,
+    copy_data,
     run_query_source,
+    metadata_obj_destination,
+)
+
+
+most_active_users = Table(
+    "most_active_users",
+    metadata_obj_destination,
+    Column("user_id", Text, nullable=False, unique=True),
+    Column("name", Text, nullable=False, unique=True),
+    Column("duration", Integer),
 )
 
 
@@ -25,14 +33,7 @@ def create_table_most_active_users():
     - "name": TEXT, can't be NULL, must be unique
     - "duration": INT
     """
-    Table(
-        "most_active_users",
-        metadata_obj_destination,
-        Column("user_id", Text, primary_key=True),
-        Column("name", Text, nullable=False, unique=True),
-        Column("duration", Integer),
-    )
-    metadata_obj_destination.create_all(get_engine_destination())
+    create_table(most_active_users, "most_active_users")
 
 
 # IMPLEMENT THIS (12 pts)
@@ -54,24 +55,11 @@ def insert_most_active_users():
 
     create table "most_active_users" if there is no table "most_active_users"
     """
-    create_table_most_active_users()
-    query = run_query_source(
-        f'''SELECT result.name, result.user_id, round(sum(duration)) AS total_duration
-        FROM (
-            SELECT users.name, users.user_id, EXTRACT(epoch FROM views.finished_at - views.started_at) / 60 AS duration
-            FROM users
-            INNER JOIN views ON users.user_id = views.user_id
-        ) result
-        GROUP BY result.name, result.user_id
-        ORDER BY sum(duration) DESC, name
-        '''
-    )
-    run_query_destination("DELETE FROM most_active_users", commit=True)
-    for i in range(len(query)):
-        q = f'''
-            INSERT INTO most_active_users VALUES {
-                query[i]["user_id"],
-                query[i]["name"],
-                query[i]["total_duration"]
-        }'''
-        run_query_destination(q, True)
+    query = run_query_source("""
+        SELECT u.user_id, u."name", ROUND(SUM(EXTRACT(epoch FROM v.finished_at-v.started_at) / 60)) AS "duration"
+        FROM users u
+        JOIN "views" v ON v.user_id = u.user_id
+        GROUP BY u.user_id, u."name"
+        ORDER BY SUM(EXTRACT(epoch FROM v.finished_at-v.started_at) / 60) DESC, u."name"
+    """)
+    copy_data(create_table_most_active_users(), most_active_users, data=query)

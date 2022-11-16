@@ -14,10 +14,17 @@ from sqlalchemy import (
     Integer,
 )
 from utils import (
+    create_table,
+    copy_data,
     metadata_obj_destination,
-    get_engine_destination,
-    run_query_destination,
-    run_query_source,
+)
+
+
+categories = Table(
+    "categories",
+    metadata_obj_destination,
+    Column("ID", Integer, nullable=False, unique=True),
+    Column("Category name", Text, nullable=False, unique=True),
 )
 
 
@@ -26,32 +33,14 @@ def create_table_categories():
     """Create table "categories" in destination database with the following constraints:
     - "ID": INTEGER, can't be NULL, must be unique
     - "Category name": TEXT, can't be NULL, must be unique
-    """
-    # Table(
-    #     "categories",
-    #     metadata_obj_destination,
-    #     Column("ID", Integer, primary_key=True),
-    #     Column("Category name", Text, nullable=False, unique=True),
-    # )
-    # metadata_obj_destination.create_all(get_engine_destination())
-    run_query_destination('''CREATE TABLE IF NOT EXISTS categories (
-        ID INTEGER NOT NULL UNIQUE,
-        "Category name" TEXT NOT NULL UNIQUE
-    )''', commit=True)
+    """    
+    create_table(categories, "categories")
 
-# PRIMARY KEY
+
 # IMPLEMENT THIS
 def copy_categories():
     """Copy all rows in table "categories" from PostgreSQL to destination table.
 
     create table categories first if there is no table categories
-    """
-    data = run_query_source(f"SELECT * FROM categories")
-    create_table_categories()
-    run_query_destination("DELETE FROM categories", commit=True)
-    for el in data:
-        query = f'''INSERT INTO categories VALUES {
-            el["ID"],
-            el["Category name"]
-        }'''
-        run_query_destination(query, commit=True)
+    """    
+    copy_data(create_table_categories(), categories, "categories")

@@ -8,13 +8,21 @@ from sqlalchemy import (
     Column,
     Text,
     Integer,
-    insert,
 )
 from utils import (
-    metadata_obj_destination,
-    get_engine_destination,
-    run_query_destination,
+    create_table,
+    copy_data,
     run_query_source,
+    metadata_obj_destination,
+)
+
+
+most_watched_videos = Table(
+    "most_watched_videos",
+    metadata_obj_destination,
+    Column("video_id", Text, nullable=False, unique=True),
+    Column("title", Text, nullable=False),
+    Column("count", Integer),
 )
 
 
@@ -25,14 +33,7 @@ def create_table_most_watched_videos():
     - "title": TEXT, can't be NULL
     - "count": INT
     """
-    Table(
-        "most_watched_videos",
-        metadata_obj_destination,
-        Column("video_id", Text, primary_key=True),
-        Column("title", Text, nullable=False),
-        Column("count", Integer),
-    )
-    metadata_obj_destination.create_all(get_engine_destination())
+    create_table(most_watched_videos, "most_watched_videos")
 
 
 # IMPLEMENT THIS
@@ -46,21 +47,11 @@ def insert_most_watched_videos():
     create table "most_watched_videos" if there is no table "most_watched_videos"
 
     """
-    create_table_most_watched_videos()
-    query = run_query_source(
-        f'''SELECT videos.video_id, videos.title, COUNT (views.view_id) AS total_view, videos.created_at
-        FROM videos
-        JOIN views on views.video_id = videos.video_id
-        GROUP BY videos.video_id, videos.title, videos.created_at
-        ORDER BY total_view DESC, videos.created_at DESC
-        '''
-    )
-    run_query_destination("DELETE FROM most_watched_videos", commit=True)
-    for i in range(len(query)):
-        q = f'''
-            INSERT INTO most_watched_videos VALUES {
-                query[i]["video_id"],
-                query[i]["title"],
-                query[i]["total_view"]
-        }'''
-        run_query_destination(q, True)
+    query = run_query_source("""
+        SELECT v2.video_id, v2.title, COUNT(v.view_id) as "count"
+        FROM "views" v
+        JOIN videos v2 ON v2.video_id = v.video_id
+        GROUP BY v2.video_id, v2.title, v2.created_at
+        ORDER BY "count" DESC, v2.created_at DESC
+    """)
+    copy_data(create_table_most_watched_videos(), most_watched_videos, data=query)

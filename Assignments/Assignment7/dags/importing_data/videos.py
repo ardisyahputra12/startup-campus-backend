@@ -13,13 +13,22 @@ from sqlalchemy import (
     Text,
     Float,
     Integer,
-    ForeignKey,
 )
 from utils import (
+    create_table,
+    copy_data,
     metadata_obj_destination,
-    get_engine_destination,
-    run_query_destination,
-    run_query_source,
+)
+
+
+videos = Table(
+    "videos",
+    metadata_obj_destination,
+    Column("video_id", Text, nullable=False, unique=True),
+    Column("title", Text, nullable=False),
+    Column("length (min)", Float, server_default = "0.0"),
+    Column("category_id", Integer, nullable=True),
+    Column("created_at", Text, nullable=False),
 )
 
 
@@ -32,25 +41,7 @@ def create_table_videos():
     - "category_id": INT
     - "created_at": TEXT, can't be NULL
     """
-    # Table(
-    #     "videos",
-    #     metadata_obj_destination,
-    #     Column("video_id", Text, primary_key=True),
-    #     Column("title", Text, nullable=False),
-    #     Column("length (min)", Float, default = 0.0),
-    #     Column("category_id", ForeignKey('categories.ID', ondelete='CASCADE', onupdate='CASCADE'), nullable=True),
-    #     Column("created_at", Text, nullable=False),
-    # )
-    # metadata_obj_destination.create_all(get_engine_destination())
-    run_query_destination('''CREATE TABLE IF NOT EXISTS videos (
-        video_id TEXT NOT NULL,
-        title TEXT NOT NULL,
-        "length (min)" FLOAT DEFAULT 0.0,
-        category_id INTEGER,
-        created_at TEXT NOT NULL,
-        PRIMARY KEY (video_id),
-        FOREIGN KEY (category_id) REFERENCES categories (ID)
-    )''', commit=True)
+    create_table(videos, "videos")
 
 
 # IMPLEMENT THIS
@@ -59,38 +50,4 @@ def copy_videos():
 
     create table videos first if there is no table videos
     """
-    data = run_query_source(f"SELECT * FROM videos")
-    # create_table_videos()
-    run_query_destination("DELETE FROM videos", commit=True)
-    # for el in data:
-    #     if el["category_id"]==None: el["category_id"]=1
-    #     # el["title"] = "None"
-    #     # el["title"] = "Haloo"
-    #     # if "'" in el["title"]:
-    #     # #     el["title"] = 'Null'
-    #     #     # l=["'"]
-    #     #     # el["title"]="".join(i for i in el["title"] if i not in l) 
-    #         # e = el["title"].replace("'", "")
-    #         # el["title"] = e
-    #         # if (e.startswith("'")==False) and (e.endswith("'")==False):
-    #         #     el["title"] = "'" + e + "'"
-    #         # else:
-    #         #     el["title"] = e
-    #     query = f'''INSERT INTO videos VALUES {
-    #         el["video_id"],
-    #         el["title"],
-    #         el["length (min)"],
-    #         el["category_id"],
-    #         format(el["created_at"])
-    #     }'''
-    #     run_query_destination(query, commit=True)
-    for el in data:
-        if el["category_id"]==None: el["category_id"]=1
-        query = f'''INSERT INTO videos VALUES {
-            el["video_id"],
-            el["title"],
-            el["length (min)"],
-            el["category_id"],
-            format(el["created_at"])
-        }'''
-        run_query_destination(query, commit=True)
+    copy_data(create_table_videos(), videos, "videos")

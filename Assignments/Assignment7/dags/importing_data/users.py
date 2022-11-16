@@ -14,10 +14,20 @@ from sqlalchemy import (
     Integer,
 )
 from utils import (
+    create_table,
+    copy_data,
     metadata_obj_destination,
-    get_engine_destination,
-    run_query_destination,
-    run_query_source,
+)
+
+
+users = Table(
+    "users",
+    metadata_obj_destination,
+    Column("user_id", Text, nullable=False, unique=True),
+    Column("name", Text, nullable=False, unique=True),
+    Column("password", Text, nullable=False),
+    Column("followers", Integer, server_default="0"),
+    Column("registered_at", Text, nullable=False),
 )
 
 
@@ -30,24 +40,7 @@ def create_table_users():
     - "followers": INT, default = 0
     - "registered_at": TEXT, can't be NULL
     """
-    # Table(
-    #     "users",
-    #     metadata_obj_destination,
-    #     Column("user_id", Text, primary_key=True),
-    #     Column("name", Text, nullable=False, unique=True),
-    #     Column("password", Text, nullable=False),
-    #     Column("followers", Integer, default=0),
-    #     Column("registered_at", Text, nullable=False),
-    # )
-    # metadata_obj_destination.create_all(get_engine_destination())
-    run_query_destination('''CREATE TABLE IF NOT EXISTS users (
-        user_id TEXT NOT NULL,
-        name TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        followers INTEGER DEFAULT 0,
-        registered_at TEXT NOT NULL,
-        PRIMARY KEY (user_id)
-    )''', commit=True)
+    create_table(users, "users")
 
 
 # IMPLEMENT THIS
@@ -57,15 +50,4 @@ def copy_users():
     create table users first if there is no table users
 
     """
-    data = run_query_source(f"SELECT * FROM users")
-    create_table_users()
-    run_query_destination("DELETE FROM users", commit=True)
-    for el in data:
-        query = f'''INSERT INTO users VALUES {
-            el["user_id"],
-            el["name"],
-            el["password"],
-            el["followers"],
-            format(el["registered_at"])
-        }'''
-        run_query_destination(query, commit=True)
+    copy_data(create_table_users(), users, "users")

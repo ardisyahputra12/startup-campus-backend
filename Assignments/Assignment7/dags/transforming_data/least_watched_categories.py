@@ -8,13 +8,21 @@ from sqlalchemy import (
     Column,
     Text,
     Integer,
-    insert,
 )
 from utils import (
-    metadata_obj_destination,
-    get_engine_destination,
-    run_query_destination,
+    create_table,
+    copy_data,
     run_query_source,
+    metadata_obj_destination,
+)
+
+
+least_watched_categories = Table(
+    "least_watched_categories",
+    metadata_obj_destination,
+    Column("category_id", Integer, nullable=False, unique=True),
+    Column("Category name", Text, nullable=False, unique=True),
+    Column("count", Integer),
 )
 
 
@@ -25,16 +33,10 @@ def create_table_least_watched_categories():
     - "Category name": TEXT, can't be NULL, must be unique
     - "count": INT
     """
-    Table(
-        "least_watched_categories",
-        metadata_obj_destination,
-        Column("category_id", Integer, primary_key=True),
-        Column("Category name", Text, nullable=False, unique=True),
-        Column("count", Integer),
-    )
-    metadata_obj_destination.create_all(get_engine_destination())
+    create_table(least_watched_categories, "least_watched_categories")
 
 
+# IMPLEMENT THIS
 def insert_least_watched_categories():
     """insert category of videos that have the least number of views to table "least_watched_categories" in destination database.
 
@@ -47,25 +49,12 @@ def insert_least_watched_categories():
     create table "least_watched_categories" first if there there is no table "least_watched_categories"
 
     """
-    create_table_least_watched_categories()
-    query = run_query_source(
-        f'''SELECT result."Category name", result."ID", COUNT (result."Category name") AS total
-        FROM (
-            SELECT c."Category name", c."ID", v.title, v.video_id
-            FROM categories AS c
-            INNER JOIN videos AS v ON c."ID" = v.category_id
-        ) result
-        INNER JOIN views ON views.video_id = result.video_id
-        GROUP BY result."Category name", result."ID"
-        ORDER BY total
-        '''
-    )
-    run_query_destination("DELETE FROM least_watched_categories", commit=True)
-    for i in range(len(query)):
-        q = f'''
-            INSERT INTO least_watched_categories VALUES {
-                query[i]["ID"],
-                query[i]["Category name"],
-                query[i]["total"]
-        }'''
-        run_query_destination(q, True)
+    query = run_query_source("""
+        SELECT v2.category_id, c."Category name", COUNT(v.video_id) as "count"
+        FROM "views" v
+        JOIN videos v2 ON v2.video_id = v.video_id
+        JOIN categories c ON c."ID" = v2.category_id
+        GROUP BY v2.category_id, c."Category name"
+        ORDER BY "count"
+    """)
+    copy_data(create_table_least_watched_categories(), least_watched_categories, data=query)
